@@ -106,7 +106,7 @@ wfnData* readFile(string file)
 		tokens = split(line, ' ');
 		for (size_t j = 2; j < 22; j++)
 		{
-			if (tokens[j].length() > 3 && false){
+			if (tokens[j].length() > 3){
 				string mess = tokens[j];
 				if (mess.length() % 3 == 2)
 				{
@@ -138,7 +138,7 @@ wfnData* readFile(string file)
 		tokens = split(line, ' ');
 		for (size_t j = 2; j < LeftOver + 2; j++)
 		{
-			if (tokens[j].length() > 3 && false){
+			if (tokens[j].length() > 3){
 				string mess = tokens[j];
 				if (mess.length() % 3 == 2)
 				{
