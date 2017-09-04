@@ -172,10 +172,11 @@ int main(int argc, char *argv[])
 		//set up threadpool
 		boost::asio::io_service ioService;
 		boost::thread_group threadpool;
-		boost::asio::io_service::work work(ioService);
+		std::auto_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(ioService));
+
 		int numOfThreads = std::thread::hardware_concurrency();
 		std::cout << numOfThreads << std::endl;
-		numOfThreads = numOfThreads ? numOfThreads : 4;
+		numOfThreads = numOfThreads ? numOfThreads : 16;
 		
 		for(int i = 0; i< numOfThreads; i++)
 			threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
@@ -199,8 +200,8 @@ int main(int argc, char *argv[])
 
 			}
 		}
+		
 		work.reset();
-		ioService.stop();
 		threadpool.join_all();
 
 		return 0;
