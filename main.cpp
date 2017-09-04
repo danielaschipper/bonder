@@ -41,9 +41,10 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	double dx = (highX - lowX) * jumpScaler;
 	double dy = (highY - lowY) * jumpScaler;
 	double dz = (highZ - lowZ) * jumpScaler;
-
 	int reps = 1 / jumpScaler;
 	bool sucsess = false;
+	
+	printf("%d\n",reps);
 	int flips = 1;
 	for (size_t i = 0; i < reps; i++)
 	{
@@ -174,8 +175,7 @@ int main(int argc, char *argv[])
 		boost::asio::io_service::work work(ioService);
 		int numOfThreads = std::thread::hardware_concurrency();
 		std::cout << numOfThreads << std::endl;
-		//numOfThreads = numOfThreads ? numOfThreads : 4;
-		numOfThreads = 4;
+		numOfThreads = numOfThreads ? numOfThreads : 4;
 		
 		for(int i = 0; i< numOfThreads; i++)
 			threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
 
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::seconds(120));	
+		work.reset();
 		ioService.stop();
 		threadpool.join_all();
 
