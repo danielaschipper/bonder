@@ -7,7 +7,7 @@
 #define abso(x) ((x > 0)? x: -x)
 #define A(x,y) (elecHess[y * 3 +x - 4])
 
-const double rhoCutoff = 0.1;
+const double rhoCutoff = 0.75;
 
 //must be set up
 

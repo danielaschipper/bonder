@@ -62,7 +62,7 @@ wfnData* readFile(string file)
 	(*output).MO = stoi(tokens[1]);
 	(*output).prim = stoi(tokens[4]);
 	(*output).nuc = stoi(tokens[6]);
-
+	tokens.clear();
 	//set up for nucli
 	(*output).x = new double[(*output).nuc];
 	(*output).y = new double[(*output).nuc];
@@ -96,9 +96,10 @@ wfnData* readFile(string file)
 		(*output).y[i] = stod(tokens[5]);
 		(*output).z[i] = stod(tokens[6]);
 		(*output).charge[i] = stoi(tokens[9]);
+		tokens.clear();
 	}
 	int noOfLines = (*output).prim / 20, LeftOver = (*output).prim % 20;
-
+	printf("%d\n", (*output).prim);
 	//read center assinments
 	for (size_t i = 0; i < noOfLines; i++)
 	{
@@ -119,15 +120,16 @@ wfnData* readFile(string file)
 				{
 					(*output).primitiveCenters[i * 20 + j - 2] = stoi(mess.substr(0,3));
 					mess = mess.erase(0, 3);
-					j++;
 				}
 				
 			}
 			else
+			{
 				(*output).primitiveCenters[i * 20 + j -2] = stoi(tokens[j]);
-			//printf("%d ", (*output).centerAssinments[i * 20 + j - 2]);
+				//printf("%d %d   ", (*output).primitiveCenters[i * 20 + j - 2],(i * 20 + j - 2));
+			}
 		}
-		
+		tokens.clear();
 		//printf("\n");
 	}
 
@@ -146,7 +148,7 @@ wfnData* readFile(string file)
 					mess = mess.erase(0, 2);
 					j++;
 				}
-				for (; j < LeftOver; j++)
+				for (; j < LeftOver +2; j++)
 				{
 					(*output).primitiveCenters[noOfLines * 20 + j - 2] = stoi(mess.substr(0,3));
 					mess = mess.erase(0, 3);
@@ -158,6 +160,7 @@ wfnData* readFile(string file)
 				(*output).primitiveCenters[noOfLines * 20 + j - 2] = stoi(tokens[j]);
 			//printf("%d ", (*output).centerAssinments[noOfLines * 20 + j - 2]);
 		}
+		tokens.clear();
 		//printf("\n");
 	}
 	
@@ -172,6 +175,7 @@ wfnData* readFile(string file)
 			(*output).primitiveOrbatalTypes[i * 20 + j - 2] = stoi(tokens[j]);
 			//printf("%d ", (*output).typeAssinments[i * 20 + j - 2]);
 		}
+		tokens.clear();
 	}
 
 	//read left over type assinments
@@ -184,6 +188,7 @@ wfnData* readFile(string file)
 			(*output).primitiveOrbatalTypes[noOfLines * 20 + j - 2] = stoi(tokens[j]);
 			//printf("%d ", (*output).typeAssinments[noOfLines * 20 + j - 2]);
 		}
+		tokens.clear();
 		//printf("\n");
 	}
 
@@ -201,6 +206,7 @@ wfnData* readFile(string file)
 			(*output).primitiveExponents[i * 5 + j - 1] = DFD(tokens[j]);
 			//printf("%f ", (*output).exponents[i * 5 + j - 1]);
 		}
+		tokens.clear();
 	}
 
 	//read left over exponents
@@ -213,6 +219,7 @@ wfnData* readFile(string file)
 			(*output).primitiveExponents[noOfLines * 5 + j - 1] = DFD(tokens[j]);
 			//printf("%f ", (*output).exponents[noOfLines * 5 + j - 1]);
 		}
+		tokens.clear();
 	}
 	//read MO
 	for (size_t k = 0; k < (*output).MO; k++)
@@ -228,7 +235,7 @@ wfnData* readFile(string file)
 		(*output).molecularOrbitalOcupancyNumber[k] = stod(tokens[7]);
 		(*output).MOeng[k] = stod(tokens[11]);
 		//printf("%f \n", (*output).MOOOC[k]);
-
+		tokens.clear();
 		// read mo coefecents
 		for (size_t i = 0; i < noOfLines; i++)
 		{
@@ -239,6 +246,7 @@ wfnData* readFile(string file)
 				(*output).molecularOrbatalCoeficents[i * 5 + j][k] = DFD(tokens[j]);
 				//printf("%f ", (*output).MOCO[j][i * 5 + j]);
 			}
+			tokens.clear();
 			//printf("\n\n");
 		}
 
@@ -252,6 +260,7 @@ wfnData* readFile(string file)
 				(*output).molecularOrbatalCoeficents[noOfLines * 5 + j][k] = DFD(tokens[j]);
 				//printf("%f ", (*output).MOCO[j][noOfLines * 5 + j]);
 			}
+			tokens.clear();
 			//printf("\n\n");
 		}
 		//printf("\n\n");
