@@ -99,7 +99,6 @@ wfnData* readFile(string file)
 		tokens.clear();
 	}
 	int noOfLines = (*output).prim / 20, LeftOver = (*output).prim % 20;
-	printf("%d\n", (*output).prim);
 	//read center assinments
 	for (size_t i = 0; i < noOfLines; i++)
 	{
@@ -132,7 +131,6 @@ wfnData* readFile(string file)
 		tokens.clear();
 		//printf("\n");
 	}
-
 	//read left over center assinments
 	if (LeftOver != 0)
 	{
@@ -163,7 +161,6 @@ wfnData* readFile(string file)
 		tokens.clear();
 		//printf("\n");
 	}
-	
 
 	//read type assinments
 	for (size_t i = 0; i < noOfLines; i++)
@@ -194,7 +191,6 @@ wfnData* readFile(string file)
 
 	noOfLines = (*output).prim / 5;
 	LeftOver = (*output).prim % 5;
-
 
 	//read exponents
 	for (size_t i = 0; i < noOfLines; i++)
@@ -265,6 +261,7 @@ wfnData* readFile(string file)
 		}
 		//printf("\n\n");
 	}
+	
 	inputFile.close();
 	return output;
 }

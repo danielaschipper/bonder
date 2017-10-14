@@ -59,13 +59,13 @@ private:
 	double getSignOfSecondEiganVaule();
 
 
-	double *__restrict moWavefuntionDX, *__restrict moWavefuntionDy, *__restrict moWavefuntionDZ, *__restrict distanceFromCenter, *__restrict dx, *__restrict dy, *__restrict dz;
-	double *__restrict moWavefuntionDXX, *__restrict moWavefuntionDYY, *__restrict moWavefuntionDZZ, *__restrict moWavefuntionVaule, *__restrict moWavefuntionHessian, *__restrict elecHess;
+	double *__restrict__ moWavefuntionDX, *__restrict__ moWavefuntionDy, *__restrict__ moWavefuntionDZ, *__restrict__ distanceFromCenter, *__restrict__ dx, *__restrict__ dy, *__restrict__ dz;
+	double *__restrict__ moWavefuntionDXX, *__restrict__ moWavefuntionDYY, *__restrict__ moWavefuntionDZZ, *__restrict__ moWavefuntionVaule, *__restrict__ moWavefuntionHessian, *__restrict__ elecHess;
 
 
 
-	double *__restrict molecularOcupancyNumber, *__restrict *__restrict moleculerOrbatalCoefecents, *__restrict centerXvaule, *__restrict centerYvaule, *__restrict centerZvaule, *__restrict primitiveExponantationVaule;
-	int *__restrict primitiveCenter, *__restrict primitiveType;
+	double *__restrict__ molecularOcupancyNumber, *__restrict__ *__restrict__ moleculerOrbatalCoefecents, *__restrict__ centerXvaule, *__restrict__ centerYvaule, *__restrict__ centerZvaule, *__restrict__ primitiveExponantationVaule;
+	int *__restrict__ primitiveCenter, *__restrict__ primitiveType;
 	double offsetx, offsety, offsetz, res;
 	int prims, nmo, centers;
 };

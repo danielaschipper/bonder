@@ -30,7 +30,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	double highZ = (*batch).atomz(b);
 	
 	printf("testing line between %d %d\n",a,b);
-	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 80)
+	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
 	{
 		return;
 	}
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 
 		int numOfThreads = std::thread::hardware_concurrency();
 		std::cout << numOfThreads << std::endl;
-		numOfThreads = numOfThreads ? numOfThreads : 16;
+		numOfThreads = 60;
 		
 		for(int i = 0; i< numOfThreads; i++)
 			threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
@@ -189,7 +189,6 @@ int main(int argc, char *argv[])
 				pdrawArgs *lineData;
 				if (argc == 7)
 				{
-					//std::cout << argv[6] << std::endl;
 					lineData = new pdrawArgs(i, j, std::stod(argv[3]), std::stod(argv[4]), std::string(argv[5]), size, inputFile, !strcmp(argv[6], "true"));
 				}
 				else
