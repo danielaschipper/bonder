@@ -28,7 +28,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	double highX = (*batch).atomx(b);
 	double highY = (*batch).atomy(b);
 	double highZ = (*batch).atomz(b);
-	
+
 	printf("testing line between %d and %d\n",a,b);
 	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
 	{
@@ -43,7 +43,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	double dz = (highZ - lowZ) * jumpScaler;
 	int reps = 1 / jumpScaler;
 	bool sucsess = false;
-	
+
 	printf("%d\n",reps);
 	int flips = 1;
 	for (size_t i = 0; i < reps; i++)
@@ -53,7 +53,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
 		if (mesured <= cutoff)
 		{
-			
+
 			analysis analize = analysis();
 			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,batch);
 
@@ -61,7 +61,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 			break;
 		}
 	}
-	
+
 
 	delete batch;
 }
@@ -77,7 +77,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 	double lowX = (*batch).atomx(c);
 	double lowY = (*batch).atomy(c);
 	double lowZ = (*batch).atomz(c);
-	
+
 	printf("testing line between centre of %d and %d and %d\n",a,b,c);
 	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
 	{
@@ -92,7 +92,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 	double dz = (highZ - lowZ) * jumpScaler;
 	int reps = 1 / jumpScaler;
 	bool sucsess = false;
-	
+
 	printf("%d\n",reps);
 	for (size_t i = 0; i < reps; i++)
 	{
@@ -100,7 +100,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
 		if (mesured <= cutoff)
 		{
-			
+
 			analysis analize = analysis();
 			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,batch);
 
@@ -108,7 +108,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 			break;
 		}
 	}
-	
+
 
 	delete batch;
 }
@@ -137,6 +137,41 @@ void pDrawline(void *input)
 	//pthread_exit(NULL);
 }
 
+void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+{
+
+
+
+	//set up threadpool
+	boost::asio::io_service ioService;
+	boost::thread_group threadpool;
+	std::auto_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(ioService));
+
+	int numOfThreads = std::thread::hardware_concurrency();
+	std::cout << numOfThreads << std::endl;
+
+	for(int i = 0; i< numOfThreads * 2; i++)
+		threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
+
+
+	for (size_t i = 0; i < (*inputFile).nuc; i++)
+	{
+		for (size_t j = 0; j < i; j++)
+		{
+			pdrawArgs *lineData;
+			lineData = new pdrawArgs(i, j, res, cutoff, outputfile, size, inputFile, makeCube);
+			ioService.post(boost::bind(pDrawline, (void *)lineData));
+
+		}
+	}
+
+	work.reset();
+	threadpool.join_all();
+	ioService.stop();
+
+}
+
+
 int main(int argc, char *argv[])
 {
 	if (argc == 1)
@@ -144,14 +179,14 @@ int main(int argc, char *argv[])
 		printf("bonder h for help\n");
 		return 0;
 	}
-		
+
 
 	if (argv[1][0] == 'h')
 	{
 		printf("the first letter determins the wht the program will do \n p looks at a point and determins the volume around it\n l looks at a line between two atoms\n a looks for all interactions\n g prints out a grid\n h displays this message\n for more detail on an operation type bonder letter");
 		return 0;
 	}
-	
+
 	wfnData *inputFile = 0;
 	if (argc != 2)
 		inputFile = init(argv[2]);
@@ -178,7 +213,7 @@ int main(int argc, char *argv[])
 		{
 			analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, true);
 		}
-		
+
 		if (sucsess)
 		{
 			printf("point given is in region\n");
@@ -227,43 +262,13 @@ int main(int argc, char *argv[])
 		if (argc != 6 && argc != 7)
 		{
 			printf("arguments are bonder a inputFile res cutoff outputFile\n");
-			return 0;
-		}
-		
+		}		
+		if (argc == 6)
+			runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile,true);
+		else
+			runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile, !strcmp(argv[8], "true"));
 
-		//set up threadpool
-		boost::asio::io_service ioService;
-		boost::thread_group threadpool;
-		std::auto_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(ioService));
-
-		int numOfThreads = std::thread::hardware_concurrency();
-		std::cout << numOfThreads << std::endl;
-		
-		for(int i = 0; i< numOfThreads * 2; i++)
-			threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
-
-
-		for (size_t i = 0; i < (*inputFile).nuc; i++)
-		{
-			for (size_t j = 0; j < i; j++)
-			{
-				pdrawArgs *lineData;
-				if (argc == 7)
-				{
-					lineData = new pdrawArgs(i, j, std::stod(argv[3]), std::stod(argv[4]), std::string(argv[5]), size, inputFile, !strcmp(argv[6], "true"));
-				}
-				else
-				{
-					lineData = new pdrawArgs(i, j, std::stod(argv[3]), std::stod(argv[4]), std::string(argv[5]) , size, inputFile, true);
-				}	
-				ioService.post(boost::bind(pDrawline, (void *)lineData));
-
-			}
-		}
-		
-		work.reset();
-		threadpool.join_all();
-		ioService.stop();
+		return 0;
 		return 0;
 	}
 
@@ -285,7 +290,7 @@ int main(int argc, char *argv[])
 
 			outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, true);
 		}
-		
+
 		printf("done");
 		return 0;
 	}
@@ -298,15 +303,15 @@ int main(int argc, char *argv[])
 }
 
 /*
-int main()
-{
-	char *args[8] = { "","a", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\h2o-h2o.wfn","0.02","0.5","C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-	//char *args[9] = { "", "l", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\ethandiol.wfn","7","10", "0.02", "0.5", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-	//char *args[9] = { "", "p", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\input.wfn","-2.87","1.83","-0.7", "0.02", "0.5", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-	//char *args[11] = { "", "g", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\ethandiol.wfn","-0.5","-0.5","-0.5","0.5","0.5","0.5", "0.02", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-	main2(6, args);
-	char quit;
-	scanf_s("%c", &quit);
-	return 0;
+   int main()
+   {
+   char *args[8] = { "","a", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\h2o-h2o.wfn","0.02","0.5","C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
+//char *args[9] = { "", "l", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\ethandiol.wfn","7","10", "0.02", "0.5", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
+//char *args[9] = { "", "p", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\input.wfn","-2.87","1.83","-0.7", "0.02", "0.5", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
+//char *args[11] = { "", "g", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\ethandiol.wfn","-0.5","-0.5","-0.5","0.5","0.5","0.5", "0.02", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
+main2(6, args);
+char quit;
+scanf_s("%c", &quit);
+return 0;
 }
 */
