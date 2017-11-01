@@ -29,7 +29,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	double highY = (*batch).atomy(b);
 	double highZ = (*batch).atomz(b);
 	
-	printf("testing line between %d %d\n",a,b);
+	printf("testing line between %d and %d\n",a,b);
 	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
 	{
 		return;
@@ -65,6 +65,54 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 
 	delete batch;
 }
+
+void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+{
+
+	analysisBatch* batch = new analysisBatch(*inputFile);
+	double highX = ((*batch).atomx(a) + (*batch).atomx(b))/2;
+	double highY = ((*batch).atomy(a) + (*batch).atomy(b))/2;
+	double highZ = ((*batch).atomz(a) + (*batch).atomz(b))/2;
+
+	double lowX = (*batch).atomx(c);
+	double lowY = (*batch).atomy(c);
+	double lowZ = (*batch).atomz(c);
+	
+	printf("testing line between centre of %d and %d and %d\n",a,b,c);
+	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
+	{
+		return;
+	}
+
+
+	double jumpScaler = res / ((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ));
+
+	double dx = (highX - lowX) * jumpScaler;
+	double dy = (highY - lowY) * jumpScaler;
+	double dz = (highZ - lowZ) * jumpScaler;
+	int reps = 1 / jumpScaler;
+	bool sucsess = false;
+	
+	printf("%d\n",reps);
+	for (size_t i = 0; i < reps; i++)
+	{
+		int k = i;
+		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
+		if (mesured <= cutoff)
+		{
+			
+			analysis analize = analysis();
+			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,batch);
+
+			analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, batch,makeCube);
+			break;
+		}
+	}
+	
+
+	delete batch;
+}
+
 
 struct pdrawArgs
 {
@@ -147,10 +195,9 @@ int main(int argc, char *argv[])
 	{
 		if (!(argc == 8 || argc == 9))
 		{
-			printf("arguments are bonder l inputFile atom1 atom2 res cutoff outputFile\n");
+			printf("arguments are bonder l inputfile atom1 atom2 res cutoff outputfile\n");
 			return 0;
 		}
-		analysisBatch* batch = new analysisBatch(*inputFile);
 		if (argc == 8)
 			drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile,true);
 		else
@@ -159,6 +206,21 @@ int main(int argc, char *argv[])
 
 	}
 
+	//letter file 1 2 res cutoff
+	if (argv[1][0] == 't')
+	{
+		if (!(argc == 8 || argc == 9))
+		{
+			printf("arguments are bonder t inputfile atom1 atom2 atom3 res cutoff outputfile\n");
+			return 0;
+		}
+		if (argc == 9)
+			drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile,true);
+		else
+			drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile, !strcmp(argv[9], "true"));
+		return 0;
+
+	}
 	//letter file res cutoff output
 	if (argv[1][0] == 'a')
 	{
@@ -177,7 +239,7 @@ int main(int argc, char *argv[])
 		int numOfThreads = std::thread::hardware_concurrency();
 		std::cout << numOfThreads << std::endl;
 		
-		for(int i = 0; i< numOfThreads; i++)
+		for(int i = 0; i< numOfThreads * 2; i++)
 			threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
 
 
