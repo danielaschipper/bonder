@@ -189,7 +189,18 @@ int main(int argc, char *argv[])
 
 	wfnData *inputFile = 0;
 	if (argc != 2)
-		inputFile = init(argv[2]);
+	{
+		try
+		{
+			inputFile = init(argv[2]);
+		
+		}
+		catch (const std::invalid_argument& ia) 
+		{
+			std::cout << "error in parssing wavefunction data, if you have more than 100 atoms 'bonder fixwfn' must be run" << std::endl;
+		}
+	}
+
 	std::cout << "data read" << std::endl;
 	const int size = 600;
 	//letter file x y z res cutoff
@@ -200,18 +211,25 @@ int main(int argc, char *argv[])
 			printf("arguments are bonder p inputFile x y z res cutoff outputFile\n");
 			return 0;
 		}
+		bool sucsess;
 		analysisBatch* batch = new analysisBatch(*inputFile);
 		analysis analize = analysis();
-		analize.setUpAnalysisBatch( std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]),batch);
-		printf("%f \n", (*batch).RDG(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5])));
-		bool sucsess;
-		if (argc == 10)
+		try
 		{
-			analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, !strcmp(argv[9], "true"));
+			analize.setUpAnalysisBatch( std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]),batch);
+			printf("%f \n", (*batch).RDG(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5])));
+			if (argc == 10)
+			{
+				analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, !strcmp(argv[9], "true"));
+			}
+			else
+			{
+				analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, true);
+			}
 		}
-		else
+		catch(const std::invalid_argument& ia)
 		{
-			analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, true);
+			std::cout << "error in arguments" << std::endl;
 		}
 
 		if (sucsess)
@@ -233,10 +251,17 @@ int main(int argc, char *argv[])
 			printf("arguments are bonder l inputfile atom1 atom2 res cutoff outputfile\n");
 			return 0;
 		}
-		if (argc == 8)
-			drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile,true);
-		else
-			drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile, !strcmp(argv[8], "true"));
+		try
+		{
+			if (argc == 8)
+				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile,true);
+			else
+				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile, !strcmp(argv[8], "true"));
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+		}
 		return 0;
 
 	}
@@ -249,10 +274,17 @@ int main(int argc, char *argv[])
 			printf("arguments are bonder t inputfile atom1 atom2 atom3 res cutoff outputfile\n");
 			return 0;
 		}
-		if (argc == 9)
-			drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile,true);
-		else
-			drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile, !strcmp(argv[9], "true"));
+		try
+		{
+			if (argc == 9)
+				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile,true);
+			else
+				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile, !strcmp(argv[9], "true"));
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+		}
 		return 0;
 
 	}
@@ -262,13 +294,20 @@ int main(int argc, char *argv[])
 		if (argc != 6 && argc != 7)
 		{
 			printf("arguments are bonder a inputFile res cutoff outputFile\n");
-		}		
-		if (argc == 6)
-			runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile,true);
-		else
-			runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile, !strcmp(argv[8], "true"));
+			return 0;
+		}
 
-		return 0;
+		try
+		{
+			if (argc == 6)
+				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile,true);
+			else
+				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile, !strcmp(argv[8], "true"));
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+		}
 		return 0;
 	}
 
@@ -281,16 +320,22 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 		analysisBatch* batch = new analysisBatch(*inputFile);
-		if (argc == 12)
+		try
 		{
-			outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, !strcmp(argv[11], "true"));
+			if (argc == 12)
+			{
+				outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, !strcmp(argv[11], "true"));
+			}
+			else
+			{
+
+				outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, true);
+			}
 		}
-		else
+		catch(const std::invalid_argument& ia)
 		{
-
-			outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, true);
+			std::cout << "error in arguments" << std::endl;
 		}
-
 		printf("done");
 		return 0;
 	}
