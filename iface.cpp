@@ -7,7 +7,7 @@
 #define abso(x) ((x > 0)? x: -x)
 #define A(x,y) (elecHess[y * 3 +x - 4])
 
-const double rhoCutoff = 0.075;
+const double rhoCutoff = 0.1;
 
 //must be set up
 
@@ -17,7 +17,7 @@ int type2iy[56] = { 0, 0, 1, 0, 0, 2, 0, 1, 0, 1, 0, 3, 0, 1, 0, 2, 2, 0, 1, 1, 
 int type2iz[56] = { 0, 0, 0, 1, 0, 0, 2, 0, 1, 1, 0, 0, 3, 0, 1, 1, 0, 2, 2, 1, 4, 3, 2, 1, 0, 3, 2, 1, 0, 2, 1, 0, 1, 0, 0, 5, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 3, 2, 1, 0, 2, 1, 0, 1, 0, 0 };
 
 
-
+//exponental function
 inline double power(double b, int p)
 {
 	double result = 1;
@@ -28,6 +28,7 @@ inline double power(double b, int p)
 	return result;
 }
 
+//setuo
 void analysisBatch::setUpBatch(double x, double y, double z, double resalution)
 {
 	offsetx = x;
@@ -36,6 +37,7 @@ void analysisBatch::setUpBatch(double x, double y, double z, double resalution)
 	res = resalution;
 }
 
+//more setup
 analysisBatch::analysisBatch(wfnData input)
 {
 	nmo = input.MO;
@@ -78,6 +80,7 @@ analysisBatch::analysisBatch(wfnData input)
 
 }
 
+//cleanup
 analysisBatch::~analysisBatch()
 {
 	delete moWavefuntionDX;
@@ -96,7 +99,7 @@ analysisBatch::~analysisBatch()
 }
 
 
-
+//clears MO wavefunction data
 void analysisBatch::vectorReset(double x,double y, double z)
 {
 	z += 0;
@@ -126,6 +129,7 @@ void analysisBatch::vectorReset(double x,double y, double z)
 	z += 0;
 }
 
+//calculates MO wave function data fir each primitive
 inline void analysisBatch::wavefunctionSecondDerivitivePrimitive(int i)
 {
 	int ix, iy, iz,center;
@@ -169,6 +173,8 @@ void analysisBatch::wavefunctionSecondDerivitive()
 
 }
 
+
+//computes the hessian matrix for the MO wavefunction primitives
 inline void analysisBatch::wavefuntionHessianPrimitive(int i)
 {
 	int ix, iy, iz;
@@ -226,6 +232,7 @@ void analysisBatch::wavefuntionhessian()
 	}
 }
 
+//calculates the firts derivitive of the MO wavefunction
 inline void analysisBatch::wavefuntionDerivitivePrimitive(int i)
 {
 	int ix, iy, iz;
@@ -270,7 +277,6 @@ void analysisBatch::wavefuntionDerivitive()
 
 }
 
-//wavefunction vaule and second derivitive prim
 
 
 inline void analysisBatch::wavefuntionVaulePrimitive(int i)

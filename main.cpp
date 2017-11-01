@@ -176,7 +176,6 @@ int main(int argc, char *argv[])
 
 		int numOfThreads = std::thread::hardware_concurrency();
 		std::cout << numOfThreads << std::endl;
-		numOfThreads = 60;
 		
 		for(int i = 0; i< numOfThreads; i++)
 			threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
@@ -202,7 +201,7 @@ int main(int argc, char *argv[])
 		
 		work.reset();
 		threadpool.join_all();
-
+		ioService.stop();
 		return 0;
 	}
 
