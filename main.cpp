@@ -116,7 +116,52 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 	delete batch;
 }
 
+void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+{
 
+	analysisBatch* batch = new analysisBatch(*inputFile);
+	double highX = ((*batch).atomx(a) + (*batch).atomx(b))/2;
+	double highY = ((*batch).atomy(a) + (*batch).atomy(b))/2;
+	double highZ = ((*batch).atomz(a) + (*batch).atomz(b))/2;
+
+	double lowX = ((*batch).atomx(c)+(*batch).atomx(d))/2;
+	double lowY = ((*batch).atomy(c)+(*batch).atomx(d))/2;
+	double lowZ = ((*batch).atomz(c)+(*batch).atomx(d))/2;
+
+	printf("testing line between centre of %d and %d and %d\n",a,b,c);
+	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
+	{
+		return;
+	}
+
+
+	double jumpScaler = res / ((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ));
+
+	double dx = (highX - lowX) * jumpScaler;
+	double dy = (highY - lowY) * jumpScaler;
+	double dz = (highZ - lowZ) * jumpScaler;
+	int reps = 1 / jumpScaler;
+	bool sucsess = false;
+
+	printf("%d\n",reps);
+	for (size_t i = 0; i < reps; i++)
+	{
+		int k = i;
+		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
+		if (mesured <= cutoff)
+		{
+
+			analysis analize = analysis();
+			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,batch);
+
+			analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, batch,makeCube);
+			break;
+		}
+	}
+
+
+	delete batch;
+}
 struct pdrawArgs
 {
 	int a; int b; double res; double cutoff; std::string outputfile; int size; wfnData* inputFile; bool makeCube;
@@ -287,6 +332,27 @@ void useInputFile(char* filename)
 		try
 		{
 			drawtrig(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]), std::stod(lines[5]), std::stod(lines[6]), lines[7], SIZE, inputFile, lines[8] != "true");
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return;
+		}
+		return;
+
+	}
+
+	if (lines[0] == "q")
+	{
+		if (lineNum != 10)
+		{
+			std::cout << "error in parsing input file\ntriangle file format is:\nt\nwfn file\natom1\natom2\natom3\natom4\nrdg cutoff\nres\noutput file name\noutput cube file"<< std::endl;
+			return;
+		}
+
+		try
+		{
+			drawquad(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]),std::stoi(lines[5]), std::stod(lines[6]), std::stod(lines[7]), lines[8], SIZE, inputFile, lines[9] != "true");
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -470,6 +536,30 @@ int main(int argc, char *argv[])
 		return 0;
 
 	}
+	
+	if (argv[1][0] == 'q')
+	{
+		if (!(argc == 9 || argc == 10))
+		{
+			printf("arguments are bonder t inputfile atom1 atom2 atom3 res cutoff outputfile\n");
+			return 0;
+		}
+		try
+		{
+			if (argc == 9)
+				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile,true);
+			else
+				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile, !strcmp(argv[9], "true"));
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return 1;
+		}
+		return 0;
+	}
+	
+
 	//letter file res cutoff output
 	if (argv[1][0] == 'a')
 	{
