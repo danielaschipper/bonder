@@ -17,6 +17,7 @@ void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other
 	gridPoint* EditingPoint = getPoint(data, currentPoint.x, currentPoint.y);
 
 	if (currentPoint.x == Xsize || currentPoint.x == 0 || currentPoint.y == Ysize || currentPoint.y == 0)
+		return;
 	if (checkIfUsed(EditingPoint, currentPoint))
 		return;
 	if ((*batch).vauleAtPoint(currentPoint, 0) >= cutOff)
