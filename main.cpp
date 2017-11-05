@@ -10,7 +10,10 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
+#include <fstream>
 
+
+const int SIZE = 600;
 
 wfnData* init(std::string file)
 {
@@ -171,6 +174,176 @@ void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* 
 
 }
 
+std::vector<std::string> readFileLines(const char* filename)
+{
+	std::vector<std::string> file;
+	std::ifstream input(filename);
+	std::string line;
+	int i = 0;
+	while (getline(input, line)){
+		file.push_back(line);
+	}
+	return file;
+}
+void useInputFile(char* filename)
+{
+
+	std::fstream inputFileTest(filename);
+	if(!inputFileTest)
+	{
+		std::cout << "input file not found" << std::endl;
+		return;
+	}
+	std::vector<std::string> lines;
+	lines = readFileLines(filename);
+	int lineNum = lines.size();
+	if(lineNum == 0)
+	{
+		std::cout << "the input file needs text" <<  std::endl;
+		printf("bonder h for help\n");
+		return;
+	}
+
+	if(lineNum == 1)
+	{
+		std::cout << "please select option in the input file and the name of the wfn file";
+		return;
+	}
+
+	wfnData *inputFile = 0;
+	try
+	{
+		inputFile = init(lines[1]);
+
+	}
+	catch (const std::invalid_argument& ia) 
+	{
+		std::cout << "error in parssing wavefunction data, if you have more than 100 atoms 'bonder fixwfn' must be run" << std::endl;
+		return;
+	}
+
+	if(lines[0] == "p")
+	{
+		if (lineNum != 9)
+		{
+			std::cout << "error in parsing input file\npoint file format is:\np\nwfn file\nx\ny\nz\nrdg cutoff\nres\noutput fiel name\noutput cube file"<< std::endl;
+			return;
+		}
+		bool sucsess;
+		analysisBatch* batch = new analysisBatch(*inputFile);
+		analysis analize = analysis();
+		try
+		{
+			analize.setUpAnalysisBatch( std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]),batch);
+			printf("%f \n", (*batch).RDG(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4])));
+			analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(lines[6]), &sucsess, inputFile, lines[7], batch,lines[8] != "true");
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return;
+		}
+
+		if (sucsess)
+		{
+			printf("point given is in region\n");
+		}
+		else
+		{
+			printf("point given is not in region\n");
+		}
+		return;
+
+	}
+
+	if (lines[0] == "l")
+	{
+		if (lineNum != 8)
+		{
+			std::cout << "error in parsing input file\nline file format is:\nl\nwfn file\natom1\natom2\nrdg cutoff\nres\noutput file name\noutput cube file"<< std::endl;
+			return;
+		}   
+		try
+		{
+			drawline(std::stoi(lines[2]), std::stoi(lines[3]), std::stod(lines[4]), std::stod(lines[5]), lines[6], SIZE, inputFile, lines[7] != "true");
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return;
+		}
+		return;
+
+	}
+	//letter file 1 2 res cutoff
+	if (lines[0] == "t")
+	{
+		if (lineNum != 9)
+		{
+			std::cout << "error in parsing input file\ntriangle file format is:\nt\nwfn file\natom1\natom2\natom3\nrdg cutoff\nres\noutput file name\noutput cube file"<< std::endl;
+			return;
+		}
+
+		try
+		{
+			drawtrig(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]), std::stod(lines[5]), std::stod(lines[6]), lines[7], SIZE, inputFile, lines[8] != "true");
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return;
+		}
+		return;
+
+	}
+	//letter file res cutoff output
+	if (lines[0] == "a")
+	{
+		if (lineNum != 6)
+		{
+			std::cout << "error in parsing input file\nall bonds file format is:\na\nwfn file\nrdg cutoff\nres\noutput file name\noutput cube file"<< std::endl;
+			return;
+		}
+
+
+		try
+		{
+			runAll(std::stod(lines[2]), std::stod(lines[3]), lines[4], SIZE, inputFile, lines[5] != "true");
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return;
+		}
+		return;
+	}
+
+	//letter file minx miny minz maxx maxy maxz res outputFile
+	if (lines[0] == "g")
+	{
+		if (lineNum != 10)
+		{
+			std::cout << "error in parsing input file\ngrid file format is:\ng\nwfn file\nlow x\nlow y\n low z\n high x\n high y \n high z\nres\noutput file name\noutput cube file"<< std::endl;
+			return;
+		}
+
+		analysisBatch* batch = new analysisBatch(*inputFile);
+		try
+		{
+
+			outputCube(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]), std::stod(lines[6]), std::stod(lines[7]), std::stod(lines[8]), lines[9], *inputFile, 1.0, batch, true);
+		}
+		catch(const std::invalid_argument& ia)
+		{
+			std::cout << "error in arguments" << std::endl;
+			return;
+		}
+		printf("done");
+		return;
+	}
+
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -187,22 +360,28 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	if (argv[1][0] == 'f')
+	{
+		useInputFile(argv[2]);
+		return 0;
+	}
+
 	wfnData *inputFile = 0;
 	if (argc != 2)
 	{
 		try
 		{
 			inputFile = init(argv[2]);
-		
+
 		}
 		catch (const std::invalid_argument& ia) 
 		{
 			std::cout << "error in parssing wavefunction data, if you have more than 100 atoms 'bonder fixwfn' must be run" << std::endl;
+			return 1;
 		}
 	}
 
 	std::cout << "data read" << std::endl;
-	const int size = 600;
 	//letter file x y z res cutoff
 	if (argv[1][0] == 'p')
 	{
@@ -220,16 +399,17 @@ int main(int argc, char *argv[])
 			printf("%f \n", (*batch).RDG(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5])));
 			if (argc == 10)
 			{
-				analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, !strcmp(argv[9], "true"));
+				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, !strcmp(argv[9], "true"));
 			}
 			else
 			{
-				analize.anilizePoint(0, 0, 0, 0, size, size, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, true);
+				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, true);
 			}
 		}
 		catch(const std::invalid_argument& ia)
 		{
 			std::cout << "error in arguments" << std::endl;
+			return 1;
 		}
 
 		if (sucsess)
@@ -254,13 +434,14 @@ int main(int argc, char *argv[])
 		try
 		{
 			if (argc == 8)
-				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile,true);
+				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile,true);
 			else
-				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], size, inputFile, !strcmp(argv[8], "true"));
+				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile, !strcmp(argv[8], "true"));
 		}
 		catch(const std::invalid_argument& ia)
 		{
 			std::cout << "error in arguments" << std::endl;
+			return 1;
 		}
 		return 0;
 
@@ -277,13 +458,14 @@ int main(int argc, char *argv[])
 		try
 		{
 			if (argc == 9)
-				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile,true);
+				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile,true);
 			else
-				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], size, inputFile, !strcmp(argv[9], "true"));
+				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile, !strcmp(argv[9], "true"));
 		}
 		catch(const std::invalid_argument& ia)
 		{
 			std::cout << "error in arguments" << std::endl;
+			return 1;
 		}
 		return 0;
 
@@ -300,13 +482,14 @@ int main(int argc, char *argv[])
 		try
 		{
 			if (argc == 6)
-				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile,true);
+				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile,true);
 			else
-				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], size, inputFile, !strcmp(argv[8], "true"));
+				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile, !strcmp(argv[6], "true"));
 		}
 		catch(const std::invalid_argument& ia)
 		{
 			std::cout << "error in arguments" << std::endl;
+			return 1;
 		}
 		return 0;
 	}
@@ -335,6 +518,7 @@ int main(int argc, char *argv[])
 		catch(const std::invalid_argument& ia)
 		{
 			std::cout << "error in arguments" << std::endl;
+			return 1;
 		}
 		printf("done");
 		return 0;
@@ -347,16 +531,3 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-/*
-   int main()
-   {
-   char *args[8] = { "","a", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\h2o-h2o.wfn","0.02","0.5","C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-//char *args[9] = { "", "l", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\ethandiol.wfn","7","10", "0.02", "0.5", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-//char *args[9] = { "", "p", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\input.wfn","-2.87","1.83","-0.7", "0.02", "0.5", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-//char *args[11] = { "", "g", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\ethandiol.wfn","-0.5","-0.5","-0.5","0.5","0.5","0.5", "0.02", "C:\\Users\\ds143\\Documents\\Visual Studio 2015\\Projects\\hydrogen bond project\\Debug\\output" };
-main2(6, args);
-char quit;
-scanf_s("%c", &quit);
-return 0;
-}
-*/

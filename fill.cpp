@@ -8,7 +8,7 @@ point* getAllNeibors(point currentPoint);
 bool checkIfUsed(gridPoint* editingPoint, point Point);
 bool checkIfEdge(point Point, void *other, double cutoff, analysisBatch* batch);
 
-void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other,analysisBatch* batch)
+void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other,analysisBatch* batch,int Xsize,int Ysize)
 {
 	point currentPoint;
 	currentPoint = (*toProcess).front();
@@ -16,7 +16,7 @@ void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other
 
 	gridPoint* EditingPoint = getPoint(data, currentPoint.x, currentPoint.y);
 
-
+	if (currentPoint.x == Xsize || currentPoint.x == 0 || currentPoint.y == Ysize || currentPoint.y == 0)
 	if (checkIfUsed(EditingPoint, currentPoint))
 		return;
 	if ((*batch).vauleAtPoint(currentPoint, 0) >= cutOff)
@@ -68,7 +68,7 @@ grid fill(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff
 	while (!(toProcess.empty()))
 	{
 		
-		fillOnce(&toProcess, &data, cutOff, other,batch);
+		fillOnce(&toProcess, &data, cutOff, other,batch,Xsize,Ysize);
 	}
 
 	*sucsess = true;
