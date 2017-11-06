@@ -4,7 +4,7 @@
 
 
 void addToGrid(gridPoint* EditingPoint,point Point,void* other,double cutOff, analysisBatch* batch);
-point* getAllNeibors(point currentPoint);
+void getAllNeibors(point currentPoint,point *neibors);
 bool checkIfUsed(gridPoint* editingPoint, point Point);
 bool checkIfEdge(point Point, void *other, double cutoff, analysisBatch* batch);
 
@@ -16,7 +16,7 @@ void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other
 
 	gridPoint* EditingPoint = getPoint(data, currentPoint.x, currentPoint.y);
 
-	if (currentPoint.x == Xsize || currentPoint.x == 0 || currentPoint.y == Ysize || currentPoint.y == 0)
+	if (currentPoint.x == ((*data).x / 2) -2 || currentPoint.x == -((*data).x / 2) +2 || currentPoint.y == (*data).y / 2 -2 || currentPoint.y == -((*data).y / 2) +2)
 		return;
 	if (checkIfUsed(EditingPoint, currentPoint))
 		return;
@@ -28,7 +28,8 @@ void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other
 
 
 	//printf("%d %d %d \n",currentPoint.x,currentPoint.y,currentPoint.z);
-	point* newPoints = getAllNeibors(currentPoint);
+	point newPoints[26];
+	getAllNeibors(currentPoint,newPoints);
 	for (size_t i = 0; i < 26; i++)
 	{
 		if (checkIfUsed(getPoint(data, newPoints[i].x, newPoints[i].y), currentPoint))
@@ -36,7 +37,6 @@ void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other
 
 		(*toProcess).push(newPoints[i]);
 	}
-	delete newPoints;
 }
 
 
@@ -62,7 +62,6 @@ grid fill(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff
 		currentPoint.z++;
 	}
 	currentPoint.z--;
-
 	std::queue<point> toProcess;
 	toProcess.push(currentPoint);
 	int l = 0;
@@ -113,9 +112,8 @@ void addToGrid(gridPoint* EditingPoint, point Point,void *other,double cutoff,an
 
 }
 
-point* getAllNeibors(point currentPoint)
+void getAllNeibors(point currentPoint,point *neibors)
 {
-	point *neibors = new point[26];
 	point aPoint;
 	int location;
 	for (size_t i = 0; i < 3; i++)
@@ -138,12 +136,10 @@ point* getAllNeibors(point currentPoint)
 			}
 		}
 	}
-	return neibors;
 }
 
-point* getOrthoNeibors(point currentPoint)
+point* getOrthoNeibors(point currentPoint,point *neibors)
 {
-	point *neibors = new point[6];
 	for (size_t i = 0; i < 6; i++)
 	{
 		neibors[i] = currentPoint;
@@ -176,16 +172,15 @@ bool checkIfUsed(gridPoint* editingPoint, point Point)
 
 bool checkIfEdge(point Point, void *other, double cutoff,analysisBatch* batch)
 {
-	point *neibors = getOrthoNeibors(Point);
+	point neibors[6];
+	getOrthoNeibors(Point,neibors);
 	for (size_t i = 0; i < 6; i++)
 	{
 		if ((*batch).vauleAtPoint(neibors[i], other) >= cutoff)
 		{
-			delete neibors;
 			return true;
 		}
 			
 	}
-	delete neibors;
 	return false;
 }

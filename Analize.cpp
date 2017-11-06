@@ -66,7 +66,7 @@ void analysis::setUpAnalysisBatch(double x, double y, double z, double resalutio
 	res = resalution;
 }
 
-void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff, bool *sucsess,wfnData *data,std::string outputFile, analysisBatch* batch,bool makeCube)
+void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff, bool *sucsess,wfnData *data,std::string outputFile, analysisBatch* batch,int makeCube)
 {
 	
 	//std::cout << makeCube << std::endl;

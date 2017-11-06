@@ -21,7 +21,7 @@ wfnData* init(std::string file)
 	return inputFile;
 }
 
-void drawline(int a, int b, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+void drawline(int a, int b, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 	analysisBatch* batch = new analysisBatch(*inputFile);
 	double lowX = (*batch).atomx(a);
@@ -69,7 +69,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	delete batch;
 }
 
-void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 
 	analysisBatch* batch = new analysisBatch(*inputFile);
@@ -116,7 +116,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 	delete batch;
 }
 
-void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 
 	analysisBatch* batch = new analysisBatch(*inputFile);
@@ -164,8 +164,8 @@ void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string ou
 }
 struct pdrawArgs
 {
-	int a; int b; double res; double cutoff; std::string outputfile; int size; wfnData* inputFile; bool makeCube;
-	pdrawArgs(int A, int B, double Res, double Cutoff, std::string Outputfile, int Size, wfnData* InputFile,bool MakeCube)
+	int a; int b; double res; double cutoff; std::string outputfile; int size; wfnData* inputFile; int makeCube;
+	pdrawArgs(int A, int B, double Res, double Cutoff, std::string Outputfile, int Size, wfnData* InputFile,int MakeCube)
 	{
 		makeCube = MakeCube;
 		a = A;
@@ -185,7 +185,7 @@ void pDrawline(void *input)
 	//pthread_exit(NULL);
 }
 
-void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,bool makeCube)
+void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 
 
@@ -281,7 +281,7 @@ void useInputFile(char* filename)
 		{
 			analize.setUpAnalysisBatch( std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]),batch);
 			printf("%f \n", (*batch).RDG(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4])));
-			analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(lines[6]), &sucsess, inputFile, lines[7], batch,lines[8] != "true");
+			analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(lines[6]), &sucsess, inputFile, lines[7],batch, std::stoi(lines[8]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -310,7 +310,7 @@ void useInputFile(char* filename)
 		}   
 		try
 		{
-			drawline(std::stoi(lines[2]), std::stoi(lines[3]), std::stod(lines[4]), std::stod(lines[5]), lines[6], SIZE, inputFile, lines[7] != "true");
+			drawline(std::stoi(lines[2]), std::stoi(lines[3]), std::stod(lines[4]), std::stod(lines[5]), lines[6], SIZE, inputFile, std::stoi(lines[7]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -331,7 +331,7 @@ void useInputFile(char* filename)
 
 		try
 		{
-			drawtrig(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]), std::stod(lines[5]), std::stod(lines[6]), lines[7], SIZE, inputFile, lines[8] != "true");
+			drawtrig(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]), std::stod(lines[5]), std::stod(lines[6]), lines[7], SIZE, inputFile, std::stoi(lines[8]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -352,7 +352,7 @@ void useInputFile(char* filename)
 
 		try
 		{
-			drawquad(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]),std::stoi(lines[5]), std::stod(lines[6]), std::stod(lines[7]), lines[8], SIZE, inputFile, lines[9] != "true");
+			drawquad(std::stoi(lines[2]), std::stoi(lines[3]),std::stoi(lines[4]),std::stoi(lines[5]), std::stod(lines[6]), std::stod(lines[7]), lines[8], SIZE, inputFile, std::stoi(lines[9]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -374,7 +374,7 @@ void useInputFile(char* filename)
 
 		try
 		{
-			runAll(std::stod(lines[2]), std::stod(lines[3]), lines[4], SIZE, inputFile, lines[5] != "true");
+			runAll(std::stod(lines[2]), std::stod(lines[3]), lines[4], SIZE, inputFile, std::stoi(lines[5]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -389,7 +389,7 @@ void useInputFile(char* filename)
 	{
 		if (lineNum != 10)
 		{
-			std::cout << "error in parsing input file\ngrid file format is:\ng\nwfn file\nlow x\nlow y\n low z\n high x\n high y \n high z\nres\noutput file name\noutput cube file"<< std::endl;
+			std::cout << "error in parsing input file\ngrid file format is:\ng\nwfn file\nlow x\nlow y\n low z\n high x\n high y \n high z\nres\noutput file name" << std::endl;
 			return;
 		}
 
@@ -397,7 +397,7 @@ void useInputFile(char* filename)
 		try
 		{
 
-			outputCube(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]), std::stod(lines[6]), std::stod(lines[7]), std::stod(lines[8]), lines[9], *inputFile, 1.0, batch, true);
+			outputCube(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]), std::stod(lines[6]), std::stod(lines[7]), std::stod(lines[8]), lines[9], *inputFile, 1.0, batch, 1);
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -465,11 +465,11 @@ int main(int argc, char *argv[])
 			printf("%f \n", (*batch).RDG(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5])));
 			if (argc == 10)
 			{
-				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, !strcmp(argv[9], "true"));
+				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, std::stoi(argv[9]));
 			}
 			else
 			{
-				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, true);
+				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, 1);
 			}
 		}
 		catch(const std::invalid_argument& ia)
@@ -500,9 +500,9 @@ int main(int argc, char *argv[])
 		try
 		{
 			if (argc == 8)
-				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile,true);
+				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile,1);
 			else
-				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile, !strcmp(argv[8], "true"));
+				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile, std::stoi(argv[8]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -524,9 +524,9 @@ int main(int argc, char *argv[])
 		try
 		{
 			if (argc == 9)
-				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile,true);
+				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile,1);
 			else
-				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile, !strcmp(argv[9], "true"));
+				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile, std::stoi(argv[9]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -547,9 +547,9 @@ int main(int argc, char *argv[])
 		try
 		{
 			if (argc == 9)
-				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile,true);
+				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile,1);
 			else
-				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile, !strcmp(argv[9], "true"));
+				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile, std::stoi(argv[9]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -574,7 +574,7 @@ int main(int argc, char *argv[])
 			if (argc == 6)
 				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile,true);
 			else
-				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile, !strcmp(argv[6], "true"));
+				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile, std::stoi(argv[6]));
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -587,7 +587,7 @@ int main(int argc, char *argv[])
 	//letter file minx miny minz maxx maxy maxz res outputFile
 	if (argv[1][0] == 'g')
 	{
-		if (argc != 11 && argc != 12)
+		if (argc != 11 )
 		{
 			printf("arguments are bonder g inputFile minx miny minz maxx maxy maxz res outputFile\n");
 			return 0;
@@ -595,15 +595,7 @@ int main(int argc, char *argv[])
 		analysisBatch* batch = new analysisBatch(*inputFile);
 		try
 		{
-			if (argc == 12)
-			{
-				outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, !strcmp(argv[11], "true"));
-			}
-			else
-			{
-
-				outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, true);
-			}
+				outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, 1);
 		}
 		catch(const std::invalid_argument& ia)
 		{

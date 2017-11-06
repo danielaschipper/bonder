@@ -6,10 +6,11 @@
 
 using namespace std;
 
-void outputCube(double minx, double miny, double minz, double maxx, double maxy, double maxz, double res, string file, wfnData inputData,double cutoff,analysisBatch* batch,bool makeCube)
+void outputCube(double minx, double miny, double minz, double maxx, double maxy, double maxz, double res, string file, wfnData inputData,double cutoff,analysisBatch* batch,int makeCube)
 {
 	int maxL = 90;
 	int a = 0,b = 0;
+	//find which atoms the interaction is between
 	for (size_t i = 0; i < inputData.nuc; i++)
 	{
 		for (size_t j = 0; j < i; j++)
@@ -74,7 +75,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	double *elfminus = new double[rdgLoops];
 	double *rhominus = new double[rdgLoops];
 
-	//cout << makeCube << endl;
+	cout << makeCube << endl;
 
 	for (size_t i = 0; i < rdgLoops; i++)
 	{
@@ -104,15 +105,15 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	{
 		outputFile << endl << endl;
 		outputFile << "  " << inputData.nuc << "  " << minx << "  " << miny << "  " << minz << endl;
-		outputFile << "  " << dx << "  " << res << "  0  0" << endl;
-		outputFile << "  " << dy << "  0  " << res << "  0" << endl;
-		outputFile << "  " << dz << "  0  0  " << res << endl;
+		outputFile << "  " << (dx-1) / makeCube + 1 << "  " << res * makeCube << "  0  0" << endl;
+		outputFile << "  " << (dy-1) / makeCube + 1 << "  0  " << res * makeCube << "  0" << endl;
+		outputFile << "  " << (dz-1) / makeCube + 1<< "  0  0  " << res * makeCube << endl;
 
 		outputFilerho << endl << endl;
 		outputFilerho << "  " << inputData.nuc << "  " << minx << "  " << miny << "  " << minz << endl;
-		outputFilerho << "  " << dx << "  " << res << "  0  0" << endl;
-		outputFilerho << "  " << dy << "  0  " << res << "  0" << endl;
-		outputFilerho << "  " << dz << "  0  0  " << res << endl;
+		outputFilerho << "  " << (dx-1) / makeCube + 1 << "  " << res * makeCube << "  0  0" << endl;
+		outputFilerho << "  " << (dy-1) / makeCube + 1 << "  0  " << res * makeCube << "  0" << endl;
+		outputFilerho << "  " << (dz-1) / makeCube + 1 << "  0  0  " << res * makeCube << endl;
 
 		for (size_t i = 0; i < inputData.nuc; i++)
 		{
@@ -126,20 +127,27 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 
 
 	double output,rho;
+	int imod,jmod,kmod;
 	for (size_t i = 0; i < dx; i++)
 	{
+		if(makeCube)
+			imod = i % makeCube;
 		//printf("grid is %f percent complete\n", ((i * 100.0) * (1.0/xs) ));
 		for (size_t j = 0; j < dy; j++)
 		{
+			if (makeCube)
+				jmod = j % makeCube;
 			for (size_t k = 0; k < dz; k++)
 			{
+				if (makeCube)
+					kmod = k % makeCube;
 
 				output = (*batch).RDG_rho(minx + res * i, miny + res * j, minz + res * k, &rho);
-				if (makeCube)
+				if (makeCube && !imod && !jmod && !kmod)
 				{
 					outputFile << "  " << output;
 					outputFilerho << " " << rho;
-					if (k % 6 == 5)
+					if ((k/makeCube) % 6 == 5)
 					{
 						outputFile << endl;
 						outputFilerho << endl;
@@ -189,7 +197,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 				}
 
 			}
-			if (makeCube)
+			if (makeCube && !imod && !jmod)
 			{
 				outputFile << endl;
 				outputFilerho << endl;
