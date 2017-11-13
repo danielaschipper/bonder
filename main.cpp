@@ -516,7 +516,7 @@ int main(int argc, char *argv[])
 	//letter file 1 2 res cutoff
 	if (argv[1][0] == 't')
 	{
-		if (!(argc == 8 || argc == 9))
+		if (!(argc == 9 || argc == 10))
 		{
 			printf("arguments are bonder t inputfile atom1 atom2 atom3 res cutoff outputfile\n");
 			return 0;
@@ -539,17 +539,17 @@ int main(int argc, char *argv[])
 	
 	if (argv[1][0] == 'q')
 	{
-		if (!(argc == 9 || argc == 10))
+		if (!(argc == 10 || argc == 11))
 		{
-			printf("arguments are bonder t inputfile atom1 atom2 atom3 res cutoff outputfile\n");
+			printf("arguments are bonder q inputfile atom1 atom2 atom3 atom4 res cutoff outputfile\n");
 			return 0;
 		}
 		try
 		{
-			if (argc == 9)
-				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile,1);
+			if (argc == 10)
+				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[9], SIZE, inputFile,1);
 			else
-				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[1], SIZE, inputFile, std::stoi(argv[9]));
+				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[9], SIZE, inputFile, std::stoi(argv[10]));
 		}
 		catch(const std::invalid_argument& ia)
 		{

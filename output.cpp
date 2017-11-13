@@ -60,7 +60,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	int dy = (maxy - miny) / res;
 	int dz = (maxz - minz) / res;
 
-	int rdgLoops = cutoff / 0.1 + 1;
+	int rdgLoops = (cutoff + 0.01) / 0.1 + 1;
 	double *kinEngplus = new double[rdgLoops];
 	double *potEngplus = new double[rdgLoops];
 	double *totEngplus = new double[rdgLoops];
