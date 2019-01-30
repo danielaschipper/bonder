@@ -75,7 +75,7 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 	while (looping)
 	{
 		mutexCube.lock();
-		for (int i = 0; i < (*spacesUsed).size(); i++)
+		for (unsigned int i = 0; i < (*spacesUsed).size(); i++)
 		{
 			cube var = (*spacesUsed)[i];
 			if (offsetx < var.maxX && offsetx > var.minX && offsety< var.maxY && offsety > var.minY && offsetz < var.maxZ && offsetz > var.minZ)
@@ -139,7 +139,7 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 			
 			std::sort(edges, edges + size, edgeComp);
 			int lastZ = INT32_MAX;
-			for (size_t k = 0; k < size; k++)
+			for (int k = 0; k < size; k++)
 			{
 				//printf("%d %d %d\n", i, j, edges[k].Z);
 				if (edges[k].Z < minZ)
@@ -176,7 +176,7 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 	
 
 	mutexCube.lock();
-	for (int i = 0; i < (*spacesUsed).size(); i++)
+	for (unsigned int i = 0; i < (*spacesUsed).size(); i++)
 	{
 		cube var = (*spacesUsed)[i];
 		if (offsetx < var.maxX && offsetx > var.minX && offsety< var.maxY && offsety > var.minY && offsetz < var.maxZ && offsetz > var.minZ)
@@ -198,9 +198,9 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 
 	if (!(outputFile.empty()))
 		outputCube(minX* res + offsetx, minY* res + offsety, minZ* res + offsetz, maxX* res + offsetx, maxY* res + offsety, maxZ* res + offsetz, res, outputFile, *data,cutOff,batch,makeCube);
-	/*for (size_t i = 0; i < Xsize; i++)
+	/*for (int i = 0; i < Xsize; i++)
 	{
-		for (size_t j = 0; j < Ysize; j++)
+		for (int j = 0; j < Ysize; j++)
 		{
 			currentPoint = *getPoint(&results, i, j);
 			delete (currentPoint.edges);

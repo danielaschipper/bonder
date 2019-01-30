@@ -12,7 +12,7 @@ struct wfnData
 	std::string *name;
 	int *charge;
 
-	//assinments
+	//primitives
 	int* primitiveCenters, *primitiveOrbatalTypes;
 	double* primitiveExponents;
 
@@ -31,3 +31,4 @@ struct wfnData
 };
 
 wfnData* readFile(std::string file);
+wfnData* readWfx(std::string file);

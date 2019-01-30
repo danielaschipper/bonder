@@ -25,7 +25,7 @@ bool LLi::search(int i)
 LLi::~LLi()
 {
 	node *current = head, *lastUsed;
-	while (!current)
+	while (current)
 	{
 		lastUsed = current;
 		current = (*current).next;
@@ -66,7 +66,7 @@ edgepoint* LLE::dump(int* size)
 		return 0;
 	edgepoint* result = new edgepoint[(*size)];
 	next = head;
-	for (size_t i = 0; i < (*size); i++)
+	for (int i = 0; i < (*size); i++)
 	{
 		result[i] = (*next).data;
 		next = (*next).next;
@@ -77,7 +77,7 @@ edgepoint* LLE::dump(int* size)
 LLE::~LLE()
 {
 	node *current = head, *lastUsed;
-	while (!current)
+	while (current)
 	{
 		lastUsed = current;
 		current = (*current).next;

@@ -30,7 +30,7 @@ void fillOnce(std::queue<point> *toProcess,grid *data,double cutOff, void* other
 	//printf("%d %d %d \n",currentPoint.x,currentPoint.y,currentPoint.z);
 	point newPoints[26];
 	getAllNeibors(currentPoint,newPoints);
-	for (size_t i = 0; i < 26; i++)
+	for (int i = 0; i < 26; i++)
 	{
 		if (checkIfUsed(getPoint(data, newPoints[i].x, newPoints[i].y), currentPoint))
 			continue;
@@ -64,7 +64,6 @@ grid fill(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff
 	currentPoint.z--;
 	std::queue<point> toProcess;
 	toProcess.push(currentPoint);
-	int l = 0;
 	while (!(toProcess.empty()))
 	{
 		
@@ -116,11 +115,11 @@ void getAllNeibors(point currentPoint,point *neibors)
 {
 	point aPoint;
 	int location;
-	for (size_t i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		for (size_t j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
-			for (size_t k = 0; k < 3; k++)
+			for (int k = 0; k < 3; k++)
 			{
 				location = i + 3 * j + 9 * k;
 				if (location == 13)
@@ -140,7 +139,7 @@ void getAllNeibors(point currentPoint,point *neibors)
 
 point* getOrthoNeibors(point currentPoint,point *neibors)
 {
-	for (size_t i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		neibors[i] = currentPoint;
 	}
@@ -174,7 +173,7 @@ bool checkIfEdge(point Point, void *other, double cutoff,analysisBatch* batch)
 {
 	point neibors[6];
 	getOrthoNeibors(Point,neibors);
-	for (size_t i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		if ((*batch).vauleAtPoint(neibors[i], other) >= cutoff)
 		{

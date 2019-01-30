@@ -80,13 +80,13 @@ wfnData* readFile(string file)
 	(*output).MOType = new double[(*output).MO];
 	(*output).MOeng = new double[(*output).MO];
 	(*output).molecularOrbatalCoeficents = new double*[(*output).prim];
-	for (size_t i = 0; i < (*output).prim; i++)
+	for (int i = 0; i < (*output).prim; i++)
 	{
 		(*output).molecularOrbatalCoeficents[i] = new double[(*output).MO];
 	}
 
 	//read atomic data
-	for (size_t i = 0; i < (*output).nuc; i++)
+	for (int i = 0; i < (*output).nuc; i++)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
@@ -100,11 +100,11 @@ wfnData* readFile(string file)
 	}
 	int noOfLines = (*output).prim / 20, LeftOver = (*output).prim % 20;
 	//read center assinments
-	for (size_t i = 0; i < noOfLines; i++)
+	for (int i = 0; i < noOfLines; i++)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
-		for (size_t j = 2; j < 22; j++)
+		for (int j = 2; j < 22; j++)
 		{
 			if (tokens[j].length() > 3){
 				string mess = tokens[j];
@@ -136,7 +136,7 @@ wfnData* readFile(string file)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
-		for (size_t j = 2; j < LeftOver + 2; j++)
+		for (int j = 2; j < LeftOver + 2; j++)
 		{
 			if (tokens[j].length() > 3){
 				string mess = tokens[j];
@@ -163,11 +163,11 @@ wfnData* readFile(string file)
 	}
 
 	//read type assinments
-	for (size_t i = 0; i < noOfLines; i++)
+	for (int i = 0; i < noOfLines; i++)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
-		for (size_t j = 2; j < 22; j++)
+		for (int j = 2; j < 22; j++)
 		{
 			(*output).primitiveOrbatalTypes[i * 20 + j - 2] = stoi(tokens[j]);
 			//printf("%d ", (*output).typeAssinments[i * 20 + j - 2]);
@@ -180,7 +180,7 @@ wfnData* readFile(string file)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
-		for (size_t j = 2; j < LeftOver + 2; j++)
+		for (int j = 2; j < LeftOver + 2; j++)
 		{
 			(*output).primitiveOrbatalTypes[noOfLines * 20 + j - 2] = stoi(tokens[j]);
 			//printf("%d ", (*output).typeAssinments[noOfLines * 20 + j - 2]);
@@ -193,11 +193,11 @@ wfnData* readFile(string file)
 	LeftOver = (*output).prim % 5;
 
 	//read exponents
-	for (size_t i = 0; i < noOfLines; i++)
+	for (int i = 0; i < noOfLines; i++)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
-		for (size_t j = 1; j < 6; j++)
+		for (int j = 1; j < 6; j++)
 		{
 			(*output).primitiveExponents[i * 5 + j - 1] = DFD(tokens[j]);
 			//printf("%f ", (*output).exponents[i * 5 + j - 1]);
@@ -210,7 +210,7 @@ wfnData* readFile(string file)
 	{
 		std::getline(inputFile, line);
 		tokens = split(line, ' ');
-		for (size_t j = 1; j < LeftOver + 1; j++)
+		for (int j = 1; j < LeftOver + 1; j++)
 		{
 			(*output).primitiveExponents[noOfLines * 5 + j - 1] = DFD(tokens[j]);
 			//printf("%f ", (*output).exponents[noOfLines * 5 + j - 1]);
@@ -218,7 +218,7 @@ wfnData* readFile(string file)
 		tokens.clear();
 	}
 	//read MO
-	for (size_t k = 0; k < (*output).MO; k++)
+	for (int k = 0; k < (*output).MO; k++)
 	{
 		//read mo inintalisation
 		//token 4 is type, 8 is occnum, 12 is energy
@@ -233,11 +233,11 @@ wfnData* readFile(string file)
 		//printf("%f \n", (*output).MOOOC[k]);
 		tokens.clear();
 		// read mo coefecents
-		for (size_t i = 0; i < noOfLines; i++)
+		for (int i = 0; i < noOfLines; i++)
 		{
 			std::getline(inputFile, line);
 			tokens = split(line, ' ');
-			for (size_t j = 0; j < 5; j++)
+			for (int j = 0; j < 5; j++)
 			{
 				(*output).molecularOrbatalCoeficents[i * 5 + j][k] = DFD(tokens[j]);
 				//printf("%f ", (*output).MOCO[j][i * 5 + j]);
@@ -251,7 +251,7 @@ wfnData* readFile(string file)
 		{
 			std::getline(inputFile, line);
 			tokens = split(line, ' ');
-			for (size_t j = 0; j < LeftOver; j++)
+			for (int j = 0; j < LeftOver; j++)
 			{
 				(*output).molecularOrbatalCoeficents[noOfLines * 5 + j][k] = DFD(tokens[j]);
 				//printf("%f ", (*output).MOCO[j][noOfLines * 5 + j]);

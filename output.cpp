@@ -11,9 +11,9 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	int maxL = 90;
 	int a = 0,b = 0;
 	//find which atoms the interaction is between
-	for (size_t i = 0; i < inputData.nuc; i++)
+	for (int i = 0; i < inputData.nuc; i++)
 	{
-		for (size_t j = 0; j < i; j++)
+		for (int j = 0; j < i; j++)
 		{
 			double lowX = (*batch).atomx(i);
 			double lowY = (*batch).atomy(i);
@@ -34,8 +34,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 			double dy = (highY - lowY) * jumpScaler;
 			double dz = (highZ - lowZ) * jumpScaler;
 			int reps = 1 / jumpScaler;
-			bool sucsess = false;
-			for (size_t k = 0; k < reps; k++)
+			for (int k = 0; k < reps; k++)
 			{
 				if ((lowX + k*dx)< maxx && (lowX + k*dx)> minx && (lowY + k*dy)< maxy && (lowY + k*dy)> miny &&(lowZ + k*dz)< maxz && (lowZ + k*dz)> minz)
 				{
@@ -77,7 +76,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 
 	cout << makeCube << endl;
 
-	for (size_t i = 0; i < rdgLoops; i++)
+	for (int i = 0; i < rdgLoops; i++)
 	{
 		kinEngplus[i] =0;
 		potEngplus[i] =0;
@@ -115,7 +114,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 		outputFilerho << "  " << (dy-1) / makeCube + 1 << "  0  " << res * makeCube << "  0" << endl;
 		outputFilerho << "  " << (dz-1) / makeCube + 1 << "  0  0  " << res * makeCube << endl;
 
-		for (size_t i = 0; i < inputData.nuc; i++)
+		for (int i = 0; i < inputData.nuc; i++)
 		{
 			outputFile << "  " << inputData.charge[i] << "  " << inputData.charge[i] << "  " << inputData.x[i] << "  " << inputData.y[i] << "  " << inputData.z[i] << endl;
 			outputFilerho << "  " << inputData.charge[i] << "  " << inputData.charge[i] << "  " << inputData.x[i] << "  " << inputData.y[i] << "  " << inputData.z[i] << endl;
@@ -128,16 +127,16 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 
 	double output,rho;
 	int imod,jmod,kmod;
-	for (size_t i = 0; i < dx; i++)
+	for (int i = 0; i < dx; i++)
 	{
 		if(makeCube)
 			imod = i % makeCube;
 		//printf("grid is %f percent complete\n", ((i * 100.0) * (1.0/xs) ));
-		for (size_t j = 0; j < dy; j++)
+		for (int j = 0; j < dy; j++)
 		{
 			if (makeCube)
 				jmod = j % makeCube;
-			for (size_t k = 0; k < dz; k++)
+			for (int k = 0; k < dz; k++)
 			{
 				if (makeCube)
 					kmod = k % makeCube;
@@ -161,7 +160,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 					//double info = (*batch).Information(minx + res * i, miny + res * j, minz + res * k);
 					//double gosh = (*batch).goshEntropy(minx + res * i, miny + res * j, minz + res * k);
 					//double fisher = (*batch).elf(minx + res * i, miny + res * j, minz + res * k);
-					for (size_t m = 0; (m < rdgLoops); m++)
+					for (int m = 0; (m < rdgLoops); m++)
 					{
 						if (output <= 0.1 * m)
 						{
@@ -205,7 +204,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 
 		}
 	}
-	for (size_t i = 0; i < rdgLoops; i++)
+	for (int i = 0; i < rdgLoops; i++)
 	{
 		kinEngplus[i] *= res*res*res;
 		potEngplus[i] *= res*res*res;
@@ -233,7 +232,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 		cout << "positive interaction" << endl;
 		cout << std::setw(20) << left << "RDG" << std::setw(21) << left << ",number of points" << std::setw(21) << left << ",volume" << std::setw(21) << left << ",abr kinetic energy" << std::setw(21) << left << ",abr potental energy" << std::setw(21) << left << ",abr total energy" << std::setw(21) << left << ",elf" << std::setw(21) << left << ",rho" <<  endl;
 		outputFile << std::setw(20) << left << "RDG" << std::setw(21) << left << ",number of points" << std::setw(21) << left << ",volume" << std::setw(21) << left << ",abr kinetic energy" << std::setw(21) << left << ",abr potental energy" << std::setw(21) << left << ",abr total energy" << std::setw(21) << left << ",elf" << std::setw(21) << left << ",rho" << endl;
-		for (size_t i = 1; i < rdgLoops; i++)
+		for (int i = 1; i < rdgLoops; i++)
 		{
 			cout << std::setw(20) << left << i * 0.1 << "," << std::setw(20) << left << pointsplus[i] << "," << std::setw(20) << left << pointsplus[i] * res * res * res << "," << std::setw(20) << left << kinEngplus[i] << "," << std::setw(20) << left << potEngplus[i] << "," << std::setw(20) << left << totEngplus[i] << "," << std::setw(20) << left << elfplus[i] << "," << std::setw(20) << left << rhoplus[i] << endl;
 
@@ -249,7 +248,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 		cout << std::setw(20) << left << "RDG" << std::setw(21) << left << ",number of points" << std::setw(21) << left << ",volume" << std::setw(21) << left << ",abr kinetic energy" << std::setw(21) << left << ",abr potental energy" << std::setw(21) << left << ",abr total energy" << std::setw(21) << left << ",elf" << std::setw(21) << left << ",rho" << endl;
 
 		outputFile << std::setw(20) << left << "RDG" << std::setw(21) << left << ",number of points" << std::setw(21) << left << ",volume" << std::setw(21) << left << ",abr kinetic energy" << std::setw(21) << left << ",abr potental energy" << std::setw(21) << left << ",abr total energy" << std::setw(21) << left << ",elf" << std::setw(21) << left << ",rho" << endl;
-		for (size_t i = 1; i < rdgLoops; i++)
+		for (int i = 1; i < rdgLoops; i++)
 		{
 			cout << std::setw(20) << left << i * 0.1 << "," << std::setw(20) << left << pointsminus[i] << "," << std::setw(20) << left << pointsminus[i] * res * res * res << "," << std::setw(20) << left << kinEngminus[i] << "," << std::setw(20) << left << potEngminus[i] << "," << std::setw(20) << left << totEngminus[i] << "," << std::setw(20) << left << elfminus[i] << "," << std::setw(20) << left << rhominus[i] << endl;
 
@@ -264,7 +263,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 		cout << "total interaction" << endl;
 		cout << std::setw(20) << left << "RDG" << std::setw(21) << left << ",number of points" << std::setw(21) << left << ",volume" << std::setw(21) << left << ",abr kinetic energy" << std::setw(21) << left << ",abr potental energy" << std::setw(21) << left << ",abr total energy" << std::setw(21) << left << ",elf" << std::setw(21) << left << ",rho difference" << endl;
 		outputFile << std::setw(20) << left << "RDG" << std::setw(21) << left << ",number of points" << std::setw(21) << left << ",volume" << std::setw(21) << left << ",abr kinetic energy" << std::setw(21) << left << ",abr potental energy" << std::setw(21) << left << ",abr total energy" << std::setw(21) << left << ",elf" << std::setw(21) << left << ",rho difference" << endl;
-		for (size_t i = 1; i < rdgLoops; i++)
+		for (int i = 1; i < rdgLoops; i++)
 		{
 			cout << std::setw(20) << left << i * 0.1 << "," << std::setw(20) << left << pointsplus[i] + pointsminus[i] << "," << std::setw(20) << left << (pointsminus[i] + pointsplus[i]) * res * res * res << "," << std::setw(20) << left << kinEngplus[i] + kinEngminus[i] << "," << std::setw(20) << left << potEngplus[i] + potEngminus[i] << "," << std::setw(20) << left << totEngplus[i] + totEngminus[i] << "," << std::setw(20) << left << elfplus[i] + elfminus[i] << "," << std::setw(20) << left << rhoplus[i] + rhominus[i] << endl;
 			outputFile << std::setw(20) << left << i * 0.1 << "," << std::setw(20) << left << pointsplus[i] + pointsminus[i] << "," << std::setw(20) << left << (pointsminus[i] + pointsplus[i]) * res * res * res << "," << std::setw(20) << left << kinEngplus[i] + kinEngminus[i] << "," << std::setw(20) << left << potEngplus[i] + potEngminus[i] << "," << std::setw(20) << left << totEngplus[i] + totEngminus[i] << "," << std::setw(20) << left << elfplus[i] + elfminus[i] << "," << std::setw(20) << left << rhoplus[i] + rhominus[i] << endl;

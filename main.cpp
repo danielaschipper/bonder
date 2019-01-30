@@ -17,7 +17,11 @@ const int SIZE = 600;
 
 wfnData* init(std::string file)
 {
-	wfnData *inputFile = readFile(file);
+	wfnData *inputFile;
+	if (file.back() == 'n')
+		inputFile = readFile(file);
+	else
+		inputFile = readWfx(file);
 	return inputFile;
 }
 
@@ -46,26 +50,22 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	double dz = (highZ - lowZ) * jumpScaler;
 	int reps = 1 / jumpScaler;
 	bool sucsess = false;
-
+	double minRDG = cutoff;
+	int maxi = 0;
 	printf("%d\n",reps);
-	int flips = 1;
-	for (size_t i = 0; i < reps; i++)
+	for (int i = 0; i < reps; i++)
 	{
-		int k = reps / 2 + flips * i / 2;
-		flips *= -1;
-		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
-		if (mesured <= cutoff)
-		{
-
-			analysis analize = analysis();
-			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,batch);
-
-			analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, batch,makeCube);
-			break;
-		}
+		double mesured = (*batch).RDG(lowX + i*dx, lowY + i*dy, lowZ + i*dz);
+		if (mesured < minRDG)
+			maxi = i;
 	}
 
-
+	if (maxi)
+	{
+		analysis analize = analysis();
+		analize.setUpAnalysisBatch(lowX + maxi*dx, lowY + maxi*dy, lowZ + maxi*dz, res,batch);
+		analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, batch,makeCube);
+	}
 	delete batch;
 }
 
@@ -97,7 +97,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 	bool sucsess = false;
 
 	printf("%d\n",reps);
-	for (size_t i = 0; i < reps; i++)
+	for (int i = 0; i < reps; i++)
 	{
 		int k = i;
 		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
@@ -144,7 +144,7 @@ void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string ou
 	bool sucsess = false;
 
 	printf("%d\n",reps);
-	for (size_t i = 0; i < reps; i++)
+	for (int i = 0; i < reps; i++)
 	{
 		int k = i;
 		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
@@ -201,10 +201,10 @@ void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* 
 	for(int i = 0; i< numOfThreads * 2; i++)
 		threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
 
-
-	for (size_t i = 0; i < (*inputFile).nuc; i++)
+	std::cout << (*inputFile).nuc << std::endl;
+	for (int i = 0; i < (*inputFile).nuc; i++)
 	{
-		for (size_t j = 0; j < i; j++)
+		for (int j = 0; j < i; j++)
 		{
 			pdrawArgs *lineData;
 			lineData = new pdrawArgs(i, j, res, cutoff, outputfile, size, inputFile, makeCube);
@@ -224,7 +224,6 @@ std::vector<std::string> readFileLines(const char* filename)
 	std::vector<std::string> file;
 	std::ifstream input(filename);
 	std::string line;
-	int i = 0;
 	while (getline(input, line)){
 		file.push_back(line);
 	}
@@ -536,7 +535,7 @@ int main(int argc, char *argv[])
 		return 0;
 
 	}
-	
+
 	if (argv[1][0] == 'q')
 	{
 		if (!(argc == 10 || argc == 11))
@@ -558,7 +557,7 @@ int main(int argc, char *argv[])
 		}
 		return 0;
 	}
-	
+
 
 	//letter file res cutoff output
 	if (argv[1][0] == 'a')
@@ -595,7 +594,7 @@ int main(int argc, char *argv[])
 		analysisBatch* batch = new analysisBatch(*inputFile);
 		try
 		{
-				outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, 1);
+			outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, 1);
 		}
 		catch(const std::invalid_argument& ia)
 		{

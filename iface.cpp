@@ -103,7 +103,7 @@ analysisBatch::~analysisBatch()
 void analysisBatch::vectorReset(double x,double y, double z)
 {
 	z += 0;
-	for (size_t i = 0; i < centers; ++i)
+	for (int i = 0; i < centers; ++i)
 	{
 		dx[i] = (x - centerXvaule[i]);
 		dy[i] = (y - centerYvaule[i]);
@@ -111,7 +111,7 @@ void analysisBatch::vectorReset(double x,double y, double z)
 
 		distanceFromCenter[i] = dx[i] * dx[i] + dy[i] * dy[i] + dz[i] * dz[i];
 	}
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		moWavefuntionDX[i] = 0;
 		moWavefuntionDy[i] = 0;
@@ -121,7 +121,7 @@ void analysisBatch::vectorReset(double x,double y, double z)
 		moWavefuntionDZZ[i] = 0;
 		moWavefuntionVaule[i] = 0;
 		#pragma unroll
-		for (size_t j = 0; j < 9; ++j)
+		for (int j = 0; j < 9; ++j)
 		{
 			moWavefuntionHessian[i * 9 + j] = 0;
 		}
@@ -154,7 +154,7 @@ inline void analysisBatch::wavefunctionSecondDerivitivePrimitive(int i)
 	GTFdy = power(dz[center], iz) * power(dx[center], ix) *expt * (ty + 2 * primitiveExponantationVaule[i] * power(dy[center], iy)*(-2 * iy + 2 * primitiveExponantationVaule[i] * dy[center] * dy[center] - 1));
 	GTFdz = power(dx[center], ix) * power(dy[center], iy) *expt * (tz + 2 * primitiveExponantationVaule[i] * power(dz[center], iz)*(-2 * iz + 2 * primitiveExponantationVaule[i] * dz[center] * dz[center] - 1));
 
-	for (size_t j = 0; j < nmo; ++j)
+	for (int j = 0; j < nmo; ++j)
 	{
 		moWavefuntionDXX[j] += moleculerOrbatalCoefecents[i][j] * GTFdx;
 		moWavefuntionDYY[j] += moleculerOrbatalCoefecents[i][j] * GTFdy;
@@ -165,7 +165,7 @@ inline void analysisBatch::wavefunctionSecondDerivitivePrimitive(int i)
 void analysisBatch::wavefunctionSecondDerivitive()
 {
 	//getWaveFnVaule(x, y, z);	
-	for (size_t i = 0; i < prims; ++i)
+	for (int i = 0; i < prims; ++i)
 	{
 		wavefunctionSecondDerivitivePrimitive(i);
 	}
@@ -203,7 +203,7 @@ inline void analysisBatch::wavefuntionHessianPrimitive(int i)
 	GTFdyz = power(dx[center], ix) * expt * ttz * tty;
 	GTFdzx = power(dy[center], iy) * expt * ttx * ttz;
 
-	for (size_t j = 0; j < nmo; ++j)
+	for (int j = 0; j < nmo; ++j)
 	{
 		moWavefuntionHessian[j * 9 + 1] += moleculerOrbatalCoefecents[i][j] * GTFdxy;
 		moWavefuntionHessian[j * 9 + 2] += moleculerOrbatalCoefecents[i][j] * GTFdzx;
@@ -216,12 +216,12 @@ void analysisBatch::wavefuntionhessian()
 {
 	wavefunctionSecondDerivitive();
 	//getWaveFnVaule(x, y, z);	
-	for (size_t i = 0; i < prims; ++i)
+	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionHessianPrimitive(i);
 	}
 
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		moWavefuntionHessian[i * 9 ] = moWavefuntionDXX[i];
 		//moWavefuntionHessian[i * 9 + 3] = moWavefuntionHessian[i * 9 + 1];
@@ -256,7 +256,7 @@ inline void analysisBatch::wavefuntionDerivitivePrimitive(int i)
 	GTFdy = power(dx[center], ix) * power(dz[center], iz) * expt * (ty - 2 * primitiveExponantationVaule[i] * power(dy[center], iy + 1));
 	GTFdz = power(dx[center], ix) * power(dy[center], iy) * expt * (tz - 2 * primitiveExponantationVaule[i] * power(dz[center], iz + 1));
 
-	for (size_t j = 0; j < nmo; ++j)
+	for (int j = 0; j < nmo; ++j)
 	{
 		moWavefuntionDX[j] += moleculerOrbatalCoefecents[i][j] *  GTFdx;
 		moWavefuntionDy[j] += moleculerOrbatalCoefecents[i][j] * GTFdy;
@@ -269,7 +269,7 @@ void analysisBatch::wavefuntionDerivitive()
 	
 	
 	//getWaveFnVaule(x, y, z);	
-	for (size_t i = 0; i < prims; ++i)
+	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionDerivitivePrimitive(i);
 	}
@@ -298,7 +298,7 @@ inline void analysisBatch::wavefuntionVaulePrimitive(int i)
 	expt = exp(-distanceFromCenter[center] * primitiveExponantationVaule[i]);
 	GTFval = expt * power(dx[center], ix) * power(dy[center], iy) * power(dz[center], iz);
 
-	for (size_t j = 0; j < nmo; ++j)
+	for (int j = 0; j < nmo; ++j)
 	{
 		moWavefuntionVaule[j] += moleculerOrbatalCoefecents[i][j] * GTFval;
 	}
@@ -307,7 +307,7 @@ inline void analysisBatch::wavefuntionVaulePrimitive(int i)
 void analysisBatch::wavefuntionVaule()
 {
 	//getWaveFnVaule(x, y, z);	
-	for (size_t i = 0; i < prims; ++i)
+	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionVaulePrimitive(i);
 	}
@@ -339,7 +339,7 @@ double analysisBatch::kinEnergyDensity(double x, double y, double z)
 	vectorReset(x, y, z);
 	wavefuntionDerivitive();
 	double kineng = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		kineng += molecularOcupancyNumber[i] * (moWavefuntionDX[i]* moWavefuntionDX[i] + moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionDZ[i] * moWavefuntionDZ[i]);
 	}
@@ -353,7 +353,7 @@ double analysisBatch::hamEnergyDensity(double x, double y, double z)
 	wavefuntionVaule();
 	wavefunctionSecondDerivitive();
 	double hameng = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		hameng += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * (moWavefuntionDXX[i] + moWavefuntionDYY[i] + moWavefuntionDZZ[i]);
 	}
@@ -373,12 +373,12 @@ double analysisBatch::potEnergyDensity(double x, double y, double z)
 void analysisBatch::electronDensityHessian()
 {
 #pragma unroll
-	for (size_t i = 0; i < 9; ++i)
+	for (int i = 0; i < 9; ++i)
 	{
 		elecHess[i] = 0;
 	}
 
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		elecHess[0] += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionVaule[i] * moWavefuntionHessian[9 * i + 0]);
 		elecHess[1] += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDy[i] + moWavefuntionVaule[i] * moWavefuntionHessian[9 * i + 1]);
@@ -392,7 +392,7 @@ void analysisBatch::electronDensityHessian()
 	elecHess[7] = elecHess[5];
 
 #pragma unroll
-	for (size_t i = 0; i < 9; ++i)
+	for (int i = 0; i < 9; ++i)
 	{
 		elecHess[i] *= 2;
 	}
@@ -418,7 +418,7 @@ double analysisBatch::getSignOfSecondEiganVaule()
 		double p2 = (A(1, 1) - q) * (A(1, 1) - q) + (A(2, 2) - q) * (A(2, 2) - q) + (A(3, 3) - q) * (A(3, 3) - q) + 2 * p1;
 		double p = sqrt(p2 / 6);
 		double B[9];
-		for (size_t i = 0; i < 9; ++i)
+		for (int i = 0; i < 9; ++i)
 		{
 			B[i] = (1 / p) * (elecHess[i] - q * ((i % 4) ? 0 : 1)) ; // I is the identity matrix;
 		}
@@ -452,7 +452,7 @@ double analysisBatch::RDG_rho(double x, double y, double z,double *srho)
 	wavefuntionhessian();
 	double  Rhox = 0, rhoy = 0, rhoz = 0, rhosq;
 	double rho = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 		Rhox += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionDX[i];
@@ -487,7 +487,7 @@ double analysisBatch::RDG_rho(double x, double y, double z,double *srho)
 double analysisBatch::Information(double x, double y, double z)
 {
 	double rho = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 	}
@@ -498,7 +498,7 @@ double analysisBatch::LOL(double x, double y, double z)
 {
 	double rho = 0;
 	double kineng = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 		kineng += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionDZ[i] * moWavefuntionDZ[i]);
@@ -513,7 +513,7 @@ double analysisBatch::LOL(double x, double y, double z)
 double analysisBatch::goshEntropy(double x, double y, double z)
 {
 	double rho = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 	}
@@ -522,7 +522,7 @@ double analysisBatch::goshEntropy(double x, double y, double z)
 	double TFkin = ck* pow(rho, (5.0 / 3.0));
 
 	double kineng = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		kineng += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionDZ[i] * moWavefuntionDZ[i]);
 	}
@@ -530,7 +530,7 @@ double analysisBatch::goshEntropy(double x, double y, double z)
 	kineng /= 2;
 
 	double xlap = 0 , ylap = 0, zlap = 0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		xlap += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionVaule[i] * moWavefuntionDXX[i]);
 		ylap += molecularOcupancyNumber[i] * (moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionVaule[i] * moWavefuntionDYY[i]);
@@ -546,7 +546,7 @@ double analysisBatch::goshEntropy(double x, double y, double z)
 double analysisBatch::fisher(double x, double y, double z)
 {
 	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0, rhosq;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 		Rhox += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionDX[i];
@@ -570,7 +570,7 @@ double analysisBatch::RDG(double x, double y, double z)
 	wavefuntionVaule();
 	wavefuntionDerivitive();
 	double rho = 0,Rhox = 0,rhoy = 0, rhoz = 0,rhosq;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho  += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 		Rhox += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionDX[i];
@@ -605,7 +605,7 @@ double* analysisBatch::AKinEng(double x, double y, double z)
 	//wfnsdv();
 
 	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0,lapx = 0,lapy = 0, lapz =0;
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
 		Rhox += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionDX[i];
@@ -637,10 +637,10 @@ double analysisBatch::vauleAtPoint(point Point, void * other)
 
 double analysisBatch::elf(double x, double y, double z)
 {
-	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0, rhosq;
+	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0;
 	double kineng = 0;
 	double Fc = 2.871234000; //magic number do not touch
-	for (size_t i = 0; i < nmo; ++i)
+	for (int i = 0; i < nmo; ++i)
 	{
 		kineng += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionDZ[i] * moWavefuntionDZ[i]);
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
