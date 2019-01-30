@@ -1,0 +1,12 @@
+Making bonder
+Step one: install boost 
+sudo apt-get install libboost-all-dev
+If you do not have administrative access, install boost locally and edit the makefile 
+Step two: run make
+step 3 copy the bond excutable to where you want to install it
+
+Usage
+bond h will give the varous modes the program has
+calling bond with just a letter will tell you the proper arguments for that mode of opperation
+bonder is more useful with bonder tools, these tools will automaticly run bonder with specific arguments the corispond to commen usages
+
