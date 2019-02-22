@@ -23,8 +23,10 @@ public:
 	double elf(double x, double y, double z);
 	//reduced density gradent
 	double RDG(double x, double y, double z);
-	//arkinsoms reduced energy gradent
+	//arkinsoms energy densities
 	double* AKinEng(double x, double y, double z);
+	//wavefunction energy densities
+	double* WKinEng(double x, double y, double z);
 	//reduced energy gradent and the signed vaule of rho
 	double RDG_rho(double x, double y, double z, double *srho);
 

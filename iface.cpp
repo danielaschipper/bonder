@@ -630,6 +630,14 @@ double* analysisBatch::AKinEng(double x, double y, double z)
 	return output;
 }
 
+double* analysisBatch::WKinEng(double x, double y, double z)
+{
+	double * output = new double[3];
+	output[0] = kinEnergyDensity(x,y,z); 
+	output[2] = -hamEnergyDensity(x,y,z);
+	output[1] = output[2]-output[0];
+}
+
 double analysisBatch::vauleAtPoint(point Point, void * other)
 {
 	return RDG(Point.x * res + offsetx, Point.y * res + offsety, Point.z * res + offsetz);

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <iomanip>
 
+#define abr
+
 using namespace std;
 
 void outputCube(double minx, double miny, double minz, double maxx, double maxy, double maxz, double res, string file, wfnData inputData,double cutoff,analysisBatch* batch,int makeCube)
@@ -155,7 +157,11 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 
 				if (output < cutoff)
 				{
+#ifdef abr
 					double *energy = (*batch).AKinEng(minx + res * i, miny + res * j, minz + res * k);
+#else
+					double *energy = (*batch).WKinEng(minx + res * i, miny + res * j, minz + res * k);
+#endif
 					double elf = (*batch).LOL(minx + res * i, miny + res * j, minz + res * k);
 					//double info = (*batch).Information(minx + res * i, miny + res * j, minz + res * k);
 					//double gosh = (*batch).goshEntropy(minx + res * i, miny + res * j, minz + res * k);
