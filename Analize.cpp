@@ -7,10 +7,9 @@
 #include <mutex>
 #include <list>
 #include <iostream>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
+//#include <boost/thread/mutex.hpp>
+//#include <boost/thread/thread.hpp>
 
-boost::mutex mutexCube,mutexCenters;
 
 struct center
 {
@@ -46,7 +45,6 @@ struct cube
 };
 
 std::vector<cube> *spacesUsed = new std::vector<cube>;
-std::list<center> *centers = new std::list<center>;
 
 //to sort edge points
 bool edgeComp(edgepoint i, edgepoint j)
@@ -68,47 +66,22 @@ void analysis::setUpAnalysisBatch(double x, double y, double z, double resalutio
 
 void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff, bool *sucsess,wfnData *data,std::string outputFile, analysisBatch* batch,int makeCube)
 {
-	
+
 	//std::cout << makeCube << std::endl;
 	bool looping = true;
 	center thisPoint(offsetx, offsety, offsetz);
-	while (looping)
+	for (unsigned int i = 0; i < (*spacesUsed).size(); i++)
 	{
-		mutexCube.lock();
-		for (unsigned int i = 0; i < (*spacesUsed).size(); i++)
+		cube var = (*spacesUsed)[i];
+		if (offsetx < var.maxX && offsetx > var.minX && offsety< var.maxY && offsety > var.minY && offsetz < var.maxZ && offsetz > var.minZ)
 		{
-			cube var = (*spacesUsed)[i];
-			if (offsetx < var.maxX && offsetx > var.minX && offsety< var.maxY && offsety > var.minY && offsetz < var.maxZ && offsetz > var.minZ)
-			{
-				mutexCube.unlock();
-				*sucsess = false;
-				return;
-			}
+			*sucsess = false;
+			return;
 		}
-		mutexCube.unlock();
-		mutexCenters.lock();
-		bool found = false;
-		for (std::list<center>::iterator it = ((*centers).begin()); it != ((*centers).end()); ++it)
-		{
-			if ((*it).disi(thisPoint) < 5)
-			{
-				found = true;
-				break;
-			}
-		}
-		if (!found)
-		{
-			(*centers).push_back(thisPoint);
-			looping = false;
-			mutexCenters.unlock();
-		}
-		else
-		{
-			mutexCenters.unlock();
-			boost::this_thread::sleep_for(boost::chrono::seconds(60));
-		}
-		
 	}
+	bool found = false;
+
+
 
 
 	printf("starting filling at %f %f %f\n", offsetx, offsety, offsetz);
@@ -136,7 +109,7 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 				maxY = j;
 			if (j < minY)
 				minY = j;
-			
+
 			std::sort(edges, edges + size, edgeComp);
 			int lastZ = INT32_MAX;
 			for (int k = 0; k < size; k++)
@@ -149,15 +122,15 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 
 				switch (edges[k].LR)
 				{
-				case 0:
-					vol++;
-					break;
-				case 1:
-					lastZ = edges[k].Z;
-					break;
-				case 2:
-					vol += edges[k].Z - lastZ + 1;
-					lastZ = INT32_MAX;
+					case 0:
+						vol++;
+						break;
+					case 1:
+						lastZ = edges[k].Z;
+						break;
+					case 2:
+						vol += edges[k].Z - lastZ + 1;
+						lastZ = INT32_MAX;
 				}
 			}
 			delete edges;
@@ -173,25 +146,23 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 	maxY += 10;
 	maxZ += 10;
 
-	
 
-	mutexCube.lock();
+
 	for (unsigned int i = 0; i < (*spacesUsed).size(); i++)
 	{
 		cube var = (*spacesUsed)[i];
 		if (offsetx < var.maxX && offsetx > var.minX && offsety< var.maxY && offsety > var.minY && offsetz < var.maxZ && offsetz > var.minZ)
 		{
-			mutexCube.unlock();
 			*sucsess = false;
 			return;
 		}
 	}
 	(*spacesUsed).push_back(cube(minX* res + offsetx, minY* res + offsety, minZ* res + offsetz, maxX* res + offsetx, maxY* res + offsety, maxZ* res + offsetz));
-	mutexCube.unlock();
 
-	mutexCenters.lock();
-	(*centers).remove(thisPoint);
-	mutexCenters.unlock();
+
+
+
+
 
 	printf("drawing grid at %f %f %f, %f %f %f\n", minX* res + offsetx, minY* res + offsety, minZ* res + offsetz, maxX* res + offsetx, maxY* res + offsety, maxZ* res + offsetz);
 	printf("volume is  %f\n", vol*res*res*res);
@@ -199,16 +170,16 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 	if (!(outputFile.empty()))
 		outputCube(minX* res + offsetx, minY* res + offsety, minZ* res + offsetz, maxX* res + offsetx, maxY* res + offsety, maxZ* res + offsetz, res, outputFile, *data,cutOff,batch,makeCube);
 	/*for (int i = 0; i < Xsize; i++)
-	{
-		for (int j = 0; j < Ysize; j++)
-		{
-			currentPoint = *getPoint(&results, i, j);
-			delete (currentPoint.edges);
-			delete (currentPoint.internalPoints);
-		}
-	}
-	delete results.data;
-	*/
+	  {
+	  for (int j = 0; j < Ysize; j++)
+	  {
+	  currentPoint = *getPoint(&results, i, j);
+	  delete (currentPoint.edges);
+	  delete (currentPoint.internalPoints);
+	  }
+	  }
+	  delete results.data;
+	  */
 
 }
 
