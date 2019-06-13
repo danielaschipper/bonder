@@ -123,7 +123,7 @@ void analysisBatch::vectorReset(double x,double y, double z)
 		moWavefuntionDYY[i] = 0;
 		moWavefuntionDZZ[i] = 0;
 		moWavefuntionVaule[i] = 0;
-		//#pragma unroll
+		#pragma unroll
 		for (int j = 0; j < 9; ++j)
 		{
 			moWavefuntionHessian[i * 9 + j] = 0;
@@ -168,13 +168,13 @@ void analysisBatch::wavefunctionSecondDerivitive()
 		basisY[i] = 0;
 		basisZ[i] = 0;
 	}
-	//#pragma omp for 	
+	#pragma omp parallel for 	
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefunctionSecondDerivitivePrimitive(i);
 	}
 	//TODO matrix mult
-	//#pragma omp for
+	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
 		for (int i = 0; i < prims; ++i)
@@ -231,14 +231,14 @@ void analysisBatch::wavefuntionhessian()
 		basisZ[i] = 0;
 	}
 	//getWaveFnVaule(x, y, z);	
-	//#pragma omp for 
+	#pragma omp parallel for 
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionHessianPrimitive(i);
 	}
 	//TODO matrix
 
-	//#pragma omp for
+	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
 		for (int i = 0; i < prims; ++i)
@@ -248,7 +248,7 @@ void analysisBatch::wavefuntionhessian()
 			moWavefuntionHessian[j * 9 + 5] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
 		}
 	}
-	//#pragma omp for
+	#pragma omp parallel for
 	for (int i = 0; i < nmo; ++i)
 	{
 		moWavefuntionHessian[i * 9 ] = moWavefuntionDXX[i];
@@ -296,12 +296,12 @@ void analysisBatch::wavefuntionDerivitive()
 		basisZ[i] = 0;
 	}
 	//getWaveFnVaule(x, y, z);	
-	//#pragma omp for 
+	#pragma omp parallel for 
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionDerivitivePrimitive(i);
 	}
-	//#pragma omp for
+	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
 		for (int i = 0; i < prims; ++i)
@@ -339,13 +339,13 @@ void analysisBatch::wavefuntionVaule()
 	//getWaveFnVaule(x, y, z);
 	for (int i = 0; i < prims; ++i)
 		basisY[i] = 0;	
-	//#pragma omp for 
+	#pragma omp parallel for 
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionVaulePrimitive(i);
 	}
 
-	//#pragma omp for
+	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
 		for (int i = 0; i < prims; ++i)
@@ -413,7 +413,7 @@ double analysisBatch::potEnergyDensity(double x, double y, double z)
 
 void analysisBatch::electronDensityHessian()
 {
-//#pragma unroll
+#pragma unroll
 	for (int i = 0; i < 9; ++i)
 	{
 		elecHess[i] = 0;
@@ -432,7 +432,7 @@ void analysisBatch::electronDensityHessian()
 	elecHess[6] = elecHess[2];
 	elecHess[7] = elecHess[5];
 
-//#pragma unroll
+#pragma unroll
 	for (int i = 0; i < 9; ++i)
 	{
 		elecHess[i] *= 2;
@@ -493,7 +493,7 @@ double analysisBatch::RDG_rho(double x, double y, double z,double *srho)
 	wavefuntionhessian();
 	double  Rhox = 0, rhoy = 0, rhoz = 0, rhosq;
 	double rho = 0;
-	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz)
+	//#pragma omp parallel for reduction(+:rho,Rhox,rhoy,rhoz)
 	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
@@ -612,7 +612,7 @@ double analysisBatch::RDG(double x, double y, double z)
 	wavefuntionVaule();
 	wavefuntionDerivitive();
 	double rho = 0,Rhox = 0,rhoy = 0, rhoz = 0,rhosq;
-	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz)
+	//#pragma omp parallel for reduction(+:rho,Rhox,rhoy,rhoz)
 	for (int i = 0; i < nmo; ++i)
 	{
 		rho  += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
@@ -648,7 +648,7 @@ double* analysisBatch::AKinEng(double x, double y, double z)
 	//wfnsdv();
 
 	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0,lapx = 0,lapy = 0, lapz =0;
-	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz,lapx,lapy,lapz)
+	//#pragma omp parallel for reduction(+:rho,Rhox,rhoy,rhoz,lapx,lapy,lapz)
 	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
@@ -692,7 +692,7 @@ double analysisBatch::elf(double x, double y, double z)
 	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0;
 	double kineng = 0;
 	double Fc = 2.871234000; //magic number do not touch
-	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz,kineng)
+	//#pragma omp parallel for reduction(+:rho,Rhox,rhoy,rhoz,kineng)
 	for (int i = 0; i < nmo; ++i)
 	{
 		kineng += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionDZ[i] * moWavefuntionDZ[i]);
