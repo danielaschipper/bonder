@@ -49,12 +49,15 @@ analysisBatch::analysisBatch(wfnData input)
 	moWavefuntionDZZ = new double[nmo];
 	moWavefuntionVaule = new double[nmo];
 	moWavefuntionHessian = new double[nmo * 9];
-
+	
 	elecHess = new double[9];
 
 	centers = input.nuc;
 	
 	prims = input.prim;
+	basisX = new double[prims];
+	basisY = new double[prims];
+	basisZ = new double[prims];
 
 	distanceFromCenter = new double[centers];
 	dx = new double[centers];
@@ -120,7 +123,7 @@ void analysisBatch::vectorReset(double x,double y, double z)
 		moWavefuntionDYY[i] = 0;
 		moWavefuntionDZZ[i] = 0;
 		moWavefuntionVaule[i] = 0;
-		#pragma unroll
+		//#pragma unroll
 		for (int j = 0; j < 9; ++j)
 		{
 			moWavefuntionHessian[i * 9 + j] = 0;
@@ -150,24 +153,36 @@ inline void analysisBatch::wavefunctionSecondDerivitivePrimitive(int i)
 	ty = (iy > 1) ? iy * (iy - 1) * power(dy[center], (iy - 2)) : 0;
 	tz = (iz > 1) ? iz * (iz - 1) * power(dz[center], (iz - 2)) : 0;
 
-	GTFdx = power(dy[center], iy) * power(dz[center], iz) *expt * (tx + 2 * primitiveExponantationVaule[i] * power(dx[center], ix)*(-2 * ix + 2 * primitiveExponantationVaule[i] * dx[center] * dx[center] - 1));
-	GTFdy = power(dz[center], iz) * power(dx[center], ix) *expt * (ty + 2 * primitiveExponantationVaule[i] * power(dy[center], iy)*(-2 * iy + 2 * primitiveExponantationVaule[i] * dy[center] * dy[center] - 1));
-	GTFdz = power(dx[center], ix) * power(dy[center], iy) *expt * (tz + 2 * primitiveExponantationVaule[i] * power(dz[center], iz)*(-2 * iz + 2 * primitiveExponantationVaule[i] * dz[center] * dz[center] - 1));
+	basisX[i] = power(dy[center], iy) * power(dz[center], iz) *expt * (tx + 2 * primitiveExponantationVaule[i] * power(dx[center], ix)*(-2 * ix + 2 * primitiveExponantationVaule[i] * dx[center] * dx[center] - 1));
+	basisY[i] = power(dz[center], iz) * power(dx[center], ix) *expt * (ty + 2 * primitiveExponantationVaule[i] * power(dy[center], iy)*(-2 * iy + 2 * primitiveExponantationVaule[i] * dy[center] * dy[center] - 1));
+	basisZ[i] = power(dx[center], ix) * power(dy[center], iy) *expt * (tz + 2 * primitiveExponantationVaule[i] * power(dz[center], iz)*(-2 * iz + 2 * primitiveExponantationVaule[i] * dz[center] * dz[center] - 1));
 
-	for (int j = 0; j < nmo; ++j)
-	{
-		moWavefuntionDXX[j] += moleculerOrbatalCoefecents[i][j] * GTFdx;
-		moWavefuntionDYY[j] += moleculerOrbatalCoefecents[i][j] * GTFdy;
-		moWavefuntionDZZ[j] += moleculerOrbatalCoefecents[i][j] * GTFdz;
-	}
 }
 
 void analysisBatch::wavefunctionSecondDerivitive()
 {
-	//getWaveFnVaule(x, y, z);	
+	//getWaveFnVaule(x, y, z);
+	for (int i = 0; i < prims; ++i)
+	{
+		basisX[i] = 0;
+		basisY[i] = 0;
+		basisZ[i] = 0;
+	}
+	//#pragma omp for 	
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefunctionSecondDerivitivePrimitive(i);
+	}
+	//TODO matrix mult
+	//#pragma omp for
+	for (int j = 0; j < nmo; ++j)
+	{
+		for (int i = 0; i < prims; ++i)
+		{
+			moWavefuntionDXX[j] += moleculerOrbatalCoefecents[i][j] * basisX[i];
+			moWavefuntionDYY[j] += moleculerOrbatalCoefecents[i][j] * basisY[i];
+			moWavefuntionDZZ[j] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
+		}
 	}
 
 
@@ -199,28 +214,41 @@ inline void analysisBatch::wavefuntionHessianPrimitive(int i)
 
 
 
-	GTFdxy = power(dz[center], iz) * expt * ttx * tty;
-	GTFdyz = power(dx[center], ix) * expt * ttz * tty;
-	GTFdzx = power(dy[center], iy) * expt * ttx * ttz;
+	basisX[i] = GTFdxy = power(dz[center], iz) * expt * ttx * tty;
+	basisY[i] = GTFdyz = power(dx[center], ix) * expt * ttz * tty;
+	basisZ[i] = GTFdzx = power(dy[center], iy) * expt * ttx * ttz;
 
-	for (int j = 0; j < nmo; ++j)
-	{
-		moWavefuntionHessian[j * 9 + 1] += moleculerOrbatalCoefecents[i][j] * GTFdxy;
-		moWavefuntionHessian[j * 9 + 2] += moleculerOrbatalCoefecents[i][j] * GTFdzx;
-		moWavefuntionHessian[j * 9 + 5] += moleculerOrbatalCoefecents[i][j] * GTFdyz;
-	}
 
 }
 
 void analysisBatch::wavefuntionhessian()
 {
 	wavefunctionSecondDerivitive();
+	for (int i = 0; i < prims; ++i)
+	{
+		basisX[i] = 0;
+		basisY[i] = 0;
+		basisZ[i] = 0;
+	}
 	//getWaveFnVaule(x, y, z);	
+	//#pragma omp for 
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionHessianPrimitive(i);
 	}
+	//TODO matrix
 
+	//#pragma omp for
+	for (int j = 0; j < nmo; ++j)
+	{
+		for (int i = 0; i < prims; ++i)
+		{
+			moWavefuntionHessian[j * 9 + 1] += moleculerOrbatalCoefecents[i][j] * basisX[i];
+			moWavefuntionHessian[j * 9 + 2] += moleculerOrbatalCoefecents[i][j] * basisY[i];
+			moWavefuntionHessian[j * 9 + 5] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
+		}
+	}
+	//#pragma omp for
 	for (int i = 0; i < nmo; ++i)
 	{
 		moWavefuntionHessian[i * 9 ] = moWavefuntionDXX[i];
@@ -252,29 +280,37 @@ inline void analysisBatch::wavefuntionDerivitivePrimitive(int i)
 	ty = iy ? iy * power(dy[center], (iy - 1)) : 0;
 	tz = iz ? iz * power(dz[center], (iz - 1)) : 0;
 
-	GTFdx = power(dy[center], iy) * power(dz[center], iz) * expt * (tx - 2 * primitiveExponantationVaule[i] * power(dx[center], ix + 1));
-	GTFdy = power(dx[center], ix) * power(dz[center], iz) * expt * (ty - 2 * primitiveExponantationVaule[i] * power(dy[center], iy + 1));
-	GTFdz = power(dx[center], ix) * power(dy[center], iy) * expt * (tz - 2 * primitiveExponantationVaule[i] * power(dz[center], iz + 1));
+	basisX[i] = power(dy[center], iy) * power(dz[center], iz) * expt * (tx - 2 * primitiveExponantationVaule[i] * power(dx[center], ix + 1));
+	basisY[i] = power(dx[center], ix) * power(dz[center], iz) * expt * (ty - 2 * primitiveExponantationVaule[i] * power(dy[center], iy + 1));
+	basisZ[i] = power(dx[center], ix) * power(dy[center], iy) * expt * (tz - 2 * primitiveExponantationVaule[i] * power(dz[center], iz + 1));
 
-	for (int j = 0; j < nmo; ++j)
-	{
-		moWavefuntionDX[j] += moleculerOrbatalCoefecents[i][j] *  GTFdx;
-		moWavefuntionDy[j] += moleculerOrbatalCoefecents[i][j] * GTFdy;
-		moWavefuntionDZ[j] += moleculerOrbatalCoefecents[i][j] * GTFdz;
-	}
 }
 
 void analysisBatch::wavefuntionDerivitive()
 {
 	
-	
+	for (int i = 0; i < prims; ++i)
+	{
+		basisX[i] = 0;
+		basisY[i] = 0;
+		basisZ[i] = 0;
+	}
 	//getWaveFnVaule(x, y, z);	
+	//#pragma omp for 
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionDerivitivePrimitive(i);
 	}
-	
-
+	//#pragma omp for
+	for (int j = 0; j < nmo; ++j)
+	{
+		for (int i = 0; i < prims; ++i)
+		{
+			moWavefuntionDX[j] += moleculerOrbatalCoefecents[i][j] * basisX[i];
+			moWavefuntionDy[j] += moleculerOrbatalCoefecents[i][j] * basisY[i];
+			moWavefuntionDZ[j] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
+		}
+	}
 }
 
 
@@ -293,25 +329,30 @@ inline void analysisBatch::wavefuntionVaulePrimitive(int i)
 	iy = type2iy[type];
 	iz = type2iz[type];
 
-
-
 	expt = exp(-distanceFromCenter[center] * primitiveExponantationVaule[i]);
-	GTFval = expt * power(dx[center], ix) * power(dy[center], iy) * power(dz[center], iz);
+	basisY[i] = expt * power(dx[center], ix) * power(dy[center], iy) * power(dz[center], iz);
 
-	for (int j = 0; j < nmo; ++j)
-	{
-		moWavefuntionVaule[j] += moleculerOrbatalCoefecents[i][j] * GTFval;
-	}
 }
 
 void analysisBatch::wavefuntionVaule()
 {
-	//getWaveFnVaule(x, y, z);	
+	//getWaveFnVaule(x, y, z);
+	for (int i = 0; i < prims; ++i)
+		basisY[i] = 0;	
+	//#pragma omp for 
 	for (int i = 0; i < prims; ++i)
 	{
 		wavefuntionVaulePrimitive(i);
 	}
 
+	//#pragma omp for
+	for (int j = 0; j < nmo; ++j)
+	{
+		for (int i = 0; i < prims; ++i)
+		{
+			moWavefuntionVaule[j] += moleculerOrbatalCoefecents[i][j] * basisY[i];
+		}
+	}
 
 }
 
@@ -372,7 +413,7 @@ double analysisBatch::potEnergyDensity(double x, double y, double z)
 
 void analysisBatch::electronDensityHessian()
 {
-#pragma unroll
+//#pragma unroll
 	for (int i = 0; i < 9; ++i)
 	{
 		elecHess[i] = 0;
@@ -391,7 +432,7 @@ void analysisBatch::electronDensityHessian()
 	elecHess[6] = elecHess[2];
 	elecHess[7] = elecHess[5];
 
-#pragma unroll
+//#pragma unroll
 	for (int i = 0; i < 9; ++i)
 	{
 		elecHess[i] *= 2;
@@ -452,6 +493,7 @@ double analysisBatch::RDG_rho(double x, double y, double z,double *srho)
 	wavefuntionhessian();
 	double  Rhox = 0, rhoy = 0, rhoz = 0, rhosq;
 	double rho = 0;
+	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz)
 	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
@@ -481,7 +523,7 @@ double analysisBatch::RDG_rho(double x, double y, double z,double *srho)
 		return 999;
 
 	return 0.161620459673995 * sqrt(rhosq) / (pow(rho, 4.0 / 3));
-	//0.161620459673995D0 =  1/(2*(3*pi^2)^(1/3))
+	//0.161620459673995 =  1/(2*(3*pi^2)^(1/3))
 }
 
 double analysisBatch::Information(double x, double y, double z)
@@ -570,6 +612,7 @@ double analysisBatch::RDG(double x, double y, double z)
 	wavefuntionVaule();
 	wavefuntionDerivitive();
 	double rho = 0,Rhox = 0,rhoy = 0, rhoz = 0,rhosq;
+	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz)
 	for (int i = 0; i < nmo; ++i)
 	{
 		rho  += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
@@ -605,6 +648,7 @@ double* analysisBatch::AKinEng(double x, double y, double z)
 	//wfnsdv();
 
 	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0,lapx = 0,lapy = 0, lapz =0;
+	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz,lapx,lapy,lapz)
 	for (int i = 0; i < nmo; ++i)
 	{
 		rho += molecularOcupancyNumber[i] * moWavefuntionVaule[i] * moWavefuntionVaule[i];
@@ -648,6 +692,7 @@ double analysisBatch::elf(double x, double y, double z)
 	double rho = 0, Rhox = 0, rhoy = 0, rhoz = 0;
 	double kineng = 0;
 	double Fc = 2.871234000; //magic number do not touch
+	////#pragma omp for reduction(+:rho,Rhox,rhoy,rhoz,kineng)
 	for (int i = 0; i < nmo; ++i)
 	{
 		kineng += molecularOcupancyNumber[i] * (moWavefuntionDX[i] * moWavefuntionDX[i] + moWavefuntionDy[i] * moWavefuntionDy[i] + moWavefuntionDZ[i] * moWavefuntionDZ[i]);

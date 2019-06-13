@@ -79,7 +79,6 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 			return;
 		}
 	}
-	bool found = false;
 
 
 
@@ -87,7 +86,9 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 	printf("starting filling at %f %f %f\n", offsetx, offsety, offsetz);
 	grid results = fill(x,y,z,other,Xsize,Ysize,cutOff,sucsess,batch);
 	if (!*sucsess)
+	{
 		return;
+	}
 	int maxX=x, maxY=y, maxZ=0, minX=x, minY=y, minZ=0;
 	int vol = 0;
 	gridPoint currentPoint;

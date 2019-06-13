@@ -53,12 +53,15 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	bool sucsess = false;
 	double minRDG = cutoff;
 	int maxi = 0;
-	printf("%d\n",reps);
 	for (int i = 0; i < reps; i++)
 	{
 		double mesured = (*batch).RDG(lowX + i*dx, lowY + i*dy, lowZ + i*dz);
-		if (mesured < minRDG)
+		if (mesured < cutoff)
+		{
 			maxi = i;
+			std::cout << mesured << std::endl;
+			break;
+		}
 	}
 
 	if (maxi)
