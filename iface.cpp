@@ -179,9 +179,9 @@ void analysisBatch::wavefunctionSecondDerivitive()
 	{
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionDXX[j] += moleculerOrbatalCoefecents[i][j] * basisX[i];
-			moWavefuntionDYY[j] += moleculerOrbatalCoefecents[i][j] * basisY[i];
-			moWavefuntionDZZ[j] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
+			moWavefuntionDXX[j] += moleculerOrbatalCoefecents[j][i] * basisX[i];
+			moWavefuntionDYY[j] += moleculerOrbatalCoefecents[j][i] * basisY[i];
+			moWavefuntionDZZ[j] += moleculerOrbatalCoefecents[j][i] * basisZ[i];
 		}
 	}
 
@@ -243,9 +243,9 @@ void analysisBatch::wavefuntionhessian()
 	{
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionHessian[j * 9 + 1] += moleculerOrbatalCoefecents[i][j] * basisX[i];
-			moWavefuntionHessian[j * 9 + 2] += moleculerOrbatalCoefecents[i][j] * basisY[i];
-			moWavefuntionHessian[j * 9 + 5] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
+			moWavefuntionHessian[j * 9 + 1] += moleculerOrbatalCoefecents[j][i] * basisX[i];
+			moWavefuntionHessian[j * 9 + 2] += moleculerOrbatalCoefecents[j][i] * basisY[i];
+			moWavefuntionHessian[j * 9 + 5] += moleculerOrbatalCoefecents[j][i] * basisZ[i];
 		}
 	}
 	#pragma omp parallel for
@@ -306,9 +306,9 @@ void analysisBatch::wavefuntionDerivitive()
 	{
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionDX[j] += moleculerOrbatalCoefecents[i][j] * basisX[i];
-			moWavefuntionDy[j] += moleculerOrbatalCoefecents[i][j] * basisY[i];
-			moWavefuntionDZ[j] += moleculerOrbatalCoefecents[i][j] * basisZ[i];
+			moWavefuntionDX[j] += moleculerOrbatalCoefecents[j][i] * basisX[i];
+			moWavefuntionDy[j] += moleculerOrbatalCoefecents[j][i] * basisY[i];
+			moWavefuntionDZ[j] += moleculerOrbatalCoefecents[j][i] * basisZ[i];
 		}
 	}
 }
@@ -350,7 +350,7 @@ void analysisBatch::wavefuntionVaule()
 	{
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionVaule[j] += moleculerOrbatalCoefecents[i][j] * basisY[i];
+			moWavefuntionVaule[j] += moleculerOrbatalCoefecents[j][i] * basisY[i];
 		}
 	}
 

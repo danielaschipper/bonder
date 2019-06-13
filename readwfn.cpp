@@ -79,10 +79,10 @@ wfnData* readFile(string file)
 	(*output).molecularOrbitalOcupancyNumber = new double[(*output).MO];
 	(*output).MOType = new double[(*output).MO];
 	(*output).MOeng = new double[(*output).MO];
-	(*output).molecularOrbatalCoeficents = new double*[(*output).prim];
+	(*output).molecularOrbatalCoeficents = new double*[(*output).MO];
 	for (int i = 0; i < (*output).prim; i++)
 	{
-		(*output).molecularOrbatalCoeficents[i] = new double[(*output).MO];
+		(*output).molecularOrbatalCoeficents[i] = new double[(*output).prim];
 	}
 
 	//read atomic data
@@ -239,7 +239,7 @@ wfnData* readFile(string file)
 			tokens = split(line, ' ');
 			for (int j = 0; j < 5; j++)
 			{
-				(*output).molecularOrbatalCoeficents[i * 5 + j][k] = DFD(tokens[j]);
+				(*output).molecularOrbatalCoeficents[k][i * 5 + j] = DFD(tokens[j]);
 				//printf("%f ", (*output).MOCO[j][i * 5 + j]);
 			}
 			tokens.clear();
@@ -253,7 +253,7 @@ wfnData* readFile(string file)
 			tokens = split(line, ' ');
 			for (int j = 0; j < LeftOver; j++)
 			{
-				(*output).molecularOrbatalCoeficents[noOfLines * 5 + j][k] = DFD(tokens[j]);
+				(*output).molecularOrbatalCoeficents[k][noOfLines * 5 + j] = DFD(tokens[j]);
 				//printf("%f ", (*output).MOCO[j][noOfLines * 5 + j]);
 			}
 			tokens.clear();

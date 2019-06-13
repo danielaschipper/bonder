@@ -176,10 +176,10 @@ void moo(wfnData* output,ifstream* inputFile)
 void mos(wfnData* output,ifstream* inputFile)
 {
 	string line;
-	(*output).molecularOrbatalCoeficents = new double*[(*output).prim];
+	(*output).molecularOrbatalCoeficents = new double*[(*output).MO];
 	for (int i = 0; i < (*output).prim; i++)
         {
-                (*output).molecularOrbatalCoeficents[i] = new double[(*output).MO];
+                (*output).molecularOrbatalCoeficents[i] = new double[(*output).prim];
         }
 
 	for (int j = 0; j < output->MO; j++ )
@@ -194,7 +194,7 @@ void mos(wfnData* output,ifstream* inputFile)
 			vector<string> tokens = xspilt(line,' ');
 			for (string token: tokens)
 			{
-				output->molecularOrbatalCoeficents[i][j] = stod(token);
+				output->molecularOrbatalCoeficents[j][i] = stod(token);
 				i++;
 			}
 		}
