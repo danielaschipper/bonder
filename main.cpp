@@ -59,7 +59,6 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 		if (mesured < cutoff)
 		{
 			maxi = i;
-			std::cout << mesured << std::endl;
 			break;
 		}
 	}
@@ -194,35 +193,17 @@ void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* 
 
 
 
-	//set up threadpool
-	/*
-	boost::asio::io_service ioService;
-	boost::thread_group threadpool;
-	std::auto_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(ioService));
-
-	int numOfThreads = std::thread::hardware_concurrency();
-	std::cout << numOfThreads << std::endl;
-
-	for(int i = 0; i< numOfThreads * 2; i++)
-		threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
-
-	std::cout << (*inputFile).nuc << std::endl;
-	*/
 	for (int i = 0; i < (*inputFile).nuc; i++)
 	{
 		for (int j = 0; j < i; j++)
 		{
 			pdrawArgs *lineData;
 			lineData = new pdrawArgs(i, j, res, cutoff, outputfile, size, inputFile, makeCube);
-			//ioService.post(boost::bind(pDrawline, (void *)lineData));
 			pDrawline((void *)lineData);
 
 		}
 	}
 
-	//work.reset();
-	//threadpool.join_all();
-	//ioService.stop();
 
 }
 

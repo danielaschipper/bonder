@@ -76,7 +76,6 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	double *elfminus = new double[rdgLoops];
 	double *rhominus = new double[rdgLoops];
 
-	cout << makeCube << endl;
 
 	for (int i = 0; i < rdgLoops; i++)
 	{
