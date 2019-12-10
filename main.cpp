@@ -11,9 +11,131 @@
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <fstream>
-
+#include <argp.h>
 
 const int SIZE = 600;
+
+struct arguments
+{
+	char* type;
+	char *inputFile="input.wfn";
+	double res=0.02;     
+	double cuttoff=0.3;
+	char *output="output"; 
+	int cubesize=1;
+	double x1=0,x2=1,y1=0,y2=1,z1=0,z2=1;
+	int atom1=0,atom2=1,atom3=2,atom4=3;
+	char* dir='.';
+	char* configFile="config";
+};
+
+
+static struct argp_option options[] =
+{
+	{"input",'i',"FILENAME",0,"The input wavefunction file"},
+	{"resolution",'r',"VOXELSIZE",0,"The length in amstrongs of a single voxel in the intergration grid"},
+	{"cutoff",'c',"RDGCUTTOFF",0,"The maximium value for RDG"},
+	{"output",'o',"OUTPUTPREFIX",0,"The file prefix for all output files"},
+	{"cubesize",'q',"CUBESCALE",0,"Reduces the resolution for output cubefiles by the given factor, 0 will prvent cube files from being written"},
+	{"x1",1,"XSTART",0,"Either the x cordanate to start for point mode or the x cordante for one corner in cube mode"},
+	{"y1",2,"YSTART",0,"Either the y cordanate to start for point mode or the y cordante for one corner in cube mode"},
+	{"z1",3,"ZSTART",0,"Either the z cordanate to start for point mode or the z cordante for one corner in cube mode"},
+	{"x2",4,"XEND",0,"The x cordanate for the second corner in cube mode"},
+	{"y2",4,"YEND",0,"The y cordanate for the second corner in cube mode"},
+	{"z2",4,"ZEND",0,"The z cordanate for the second corner in cube mode"},
+	{"atom1",'1',"ATOMNUMBER",0,"The first atom for use in line, trinagle or quad mode"},
+	{"atom2",'2',"ATOMNUMBER",0,"The first atom for use in line, trinagle or quad mode"},
+	{"atom3",'3',"ATOMNUMBER",0,"The first atom for use in  trinagle or quad mode"},
+	{"atom4",'4',"ATOMNUMBER",0,"The first atom for use in quad mode"},
+	{"directory",'d',"FOLDER",0,"The folder to put output files in"},
+	{"config",'c',"CONFIGFILE",0,"A file containing all of the options to run bonder, only in input mode"}
+	{0}
+}
+
+static error_t parse_opt (int key, char *arg, struct argp_state *state)
+{
+	struct arguments *arguments = state->input;
+
+	switch (key)
+	{
+		case 'i':
+			arguments->inputFile = arg;
+			break;
+		case 'r':
+			arguments->res = std::stod(arg);
+			break;
+		case 'c':
+			arguments->cuttoff = std::stod(arg);
+			break;
+		case 'o':
+			arguments->outfile = arg;
+			break;
+		case 'q'"
+			arguments->cubesize = std::stoi(arg);
+                        break;
+		case 1:
+			arguments->x1 = std::stod(arg);
+                        break;
+		case 2:
+                        arguments->y1 = std::stod(arg);
+                        break;
+		case 3:
+                        arguments->z1 = std::stod(arg);
+                        break;
+		case 4:
+                        arguments->x2 = std::stod(arg);
+                        break;
+		case 5:
+                        arguments->y2 = std::stod(arg);
+                        break;
+		case 6:
+                        arguments->y1 = std::stod(arg);
+                        break;
+		case '1':
+                        arguments->atom1 = std::stoi(arg);
+                        break;
+		case '2':
+                        arguments->atom2 = std::stoi(arg);
+                        break;
+		case '3':
+                        arguments->atom3 = std::stoi(arg);
+                        break;
+		case '4':
+                        arguments->atom4 = std::stoi(arg);
+                        break;
+		case 'd':
+                        arguments->dir = arg;
+                        break;
+		case 'c';
+			arguments->configFile=arg;
+		case ARGP_KEY_ARG:
+			if (state->arg_num >= 1)
+			{
+				argp_usage(state);
+			}
+			else
+			{
+				arguments->type = arg;
+			}
+			break;
+		case ARGP_KEY_END:
+			if (state->arg_num < 1)
+			{
+				argp_usage (state);
+			}
+			break;
+		default:
+			return ARGP_ERR_UNKNOWN;
+	}
+	return 0;
+}
+
+static char args_doc[] = "type";
+static char doc[] = "Bonder, a program designed to identify and map non covalent interactions";
+static struct argp argp = {options, parse_opt, args_doc, doc};
+
+
+
 
 wfnData* init(std::string file)
 {
@@ -412,31 +534,20 @@ void useInputFile(char* filename)
 
 int main(int argc, char *argv[])
 {
-	if (argc == 1)
-	{
-		printf("bonder h for help\n");
-		return 0;
-	}
+	struct arguments arguments;
+	argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
 
-	if (argv[1][0] == 'h')
+	if (arguments.type[0] == 'f')
 	{
-		printf("the first letter determins the wht the program will do \n p looks at a point and determins the volume around it\n l looks at a line between two atoms\n a looks for all interactions\n g prints out a grid\n h displays this message\n for more detail on an operation type bonder letter");
-		return 0;
-	}
-
-	if (argv[1][0] == 'f')
-	{
-		useInputFile(argv[2]);
+		useInputFile(arguments.configFile);
 		return 0;
 	}
 
 	wfnData *inputFile = 0;
-	if (argc != 2)
-	{
 		try
 		{
-			inputFile = init(argv[2]);
+			inputFile = init(arguments.inputFile);
 
 		}
 		catch (const std::invalid_argument& ia) 
@@ -444,38 +555,16 @@ int main(int argc, char *argv[])
 			std::cout << "error in parssing wavefunction data, if you have more than 100 atoms 'bonder fixwfn' must be run" << std::endl;
 			return 1;
 		}
-	}
 
 	std::cout << "data read" << std::endl;
 	//letter file x y z res cutoff
-	if (argv[1][0] == 'p')
+	if (arguments.type[0] == 'p')
 	{
-		if (argc != 9 && argc != 10 )
-		{
-			printf("arguments are bonder p inputFile x y z res cutoff outputFile\n");
-			return 0;
-		}
 		bool sucsess;
 		analysisBatch* batch = new analysisBatch(*inputFile);
 		analysis analize = analysis();
-		try
-		{
-			analize.setUpAnalysisBatch( std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]),batch);
-			printf("%f \n", (*batch).RDG(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5])));
-			if (argc == 10)
-			{
-				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, std::stoi(argv[9]));
-			}
-			else
-			{
-				analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, std::stod(argv[7]), &sucsess, inputFile, argv[8], batch, 1);
-			}
-		}
-		catch(const std::invalid_argument& ia)
-		{
-			std::cout << "error in arguments" << std::endl;
-			return 1;
-		}
+		analize.setUpAnalysisBatch( arguments.x1 , arguments.y1, arguments.z1, arguments.res,batch);
+		analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, arguments.cutoff, &sucsess, inputFile, arguments.output, batch, arguments.cubesize);
 
 		if (sucsess)
 		{
@@ -489,72 +578,24 @@ int main(int argc, char *argv[])
 	}
 
 	//letter file 1 2 res cutoff
-	if (argv[1][0] == 'l')
+	if (arguments.type[0] == 'l')
 	{
-		if (!(argc == 8 || argc == 9))
-		{
-			printf("arguments are bonder l inputfile atom1 atom2 res cutoff outputfile\n");
-			return 0;
-		}
-		try
-		{
-			if (argc == 8)
-				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile,1);
-			else
-				drawline(std::stoi(argv[3]), std::stoi(argv[4]), std::stod(argv[5]), std::stod(argv[6]), argv[7], SIZE, inputFile, std::stoi(argv[8]));
-		}
-		catch(const std::invalid_argument& ia)
-		{
-			std::cout << "error in arguments" << std::endl;
-			return 1;
-		}
+		drawline(std::stoi(arguments.atom1, arguments.atom2, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cube);
 		return 0;
 
 	}
 
 	//letter file 1 2 res cutoff
-	if (argv[1][0] == 't')
+	if (arguments.type[0] == 't')
 	{
-		if (!(argc == 9 || argc == 10))
-		{
-			printf("arguments are bonder t inputfile atom1 atom2 atom3 res cutoff outputfile\n");
-			return 0;
-		}
-		try
-		{
-			if (argc == 9)
-				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile,1);
-			else
-				drawtrig(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]), std::stod(argv[6]), std::stod(argv[7]), argv[8], SIZE, inputFile, std::stoi(argv[9]));
-		}
-		catch(const std::invalid_argument& ia)
-		{
-			std::cout << "error in arguments" << std::endl;
-			return 1;
-		}
+				drawtrig(arguments.atom1, arguments.atom2,arguments.atom3, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize));
 		return 0;
 
 	}
 
 	if (argv[1][0] == 'q')
 	{
-		if (!(argc == 10 || argc == 11))
-		{
-			printf("arguments are bonder q inputfile atom1 atom2 atom3 atom4 res cutoff outputfile\n");
-			return 0;
-		}
-		try
-		{
-			if (argc == 10)
-				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[9], SIZE, inputFile,1);
-			else
-				drawquad(std::stoi(argv[3]), std::stoi(argv[4]),std::stoi(argv[5]),std::stoi(argv[6]), std::stod(argv[7]), std::stod(argv[8]), argv[9], SIZE, inputFile, std::stoi(argv[10]));
-		}
-		catch(const std::invalid_argument& ia)
-		{
-			std::cout << "error in arguments" << std::endl;
-			return 1;
-		}
+		drawquad(std::stoi(arguments.atom1, arguments.atom2,arguments.atom3,arguments.atom4, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
 	}
 
@@ -562,24 +603,7 @@ int main(int argc, char *argv[])
 	//letter file res cutoff output
 	if (argv[1][0] == 'a')
 	{
-		if (argc != 6 && argc != 7)
-		{
-			printf("arguments are bonder a inputFile res cutoff outputFile\n");
-			return 0;
-		}
-
-		try
-		{
-			if (argc == 6)
-				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile,true);
-			else
-				runAll(std::stod(argv[3]), std::stod(argv[4]), argv[5], SIZE, inputFile, std::stoi(argv[6]));
-		}
-		catch(const std::invalid_argument& ia)
-		{
-			std::cout << "error in arguments" << std::endl;
-			return 1;
-		}
+		runAll(arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cube);
 		return 0;
 	}
 
@@ -594,7 +618,7 @@ int main(int argc, char *argv[])
 		analysisBatch* batch = new analysisBatch(*inputFile);
 		try
 		{
-			outputCube(std::stod(argv[3]), std::stod(argv[4]), std::stod(argv[5]), std::stod(argv[6]), std::stod(argv[7]), std::stod(argv[8]), std::stod(argv[9]), argv[10], *inputFile, 1.0, batch, 1);
+			outputCube(arguments.x1, arguments.y1, arguments.z1, arguments.x2, arguments.y2, arguments.z2, arguments.res, arguments.output, *inputFile, 1.0, batch, arguments.cube);
 		}
 		catch(const std::invalid_argument& ia)
 		{
