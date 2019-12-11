@@ -23,8 +23,10 @@ public:
 	double elf(double x, double y, double z);
 	//reduced density gradent
 	double RDG(double x, double y, double z);
-	//arkinsoms reduced energy gradent
+	//arkinsoms energy densities
 	double* AKinEng(double x, double y, double z);
+	//wavefunction energy densities
+	double* WKinEng(double x, double y, double z);
 	//reduced energy gradent and the signed vaule of rho
 	double RDG_rho(double x, double y, double z, double *srho);
 
@@ -61,7 +63,8 @@ private:
 
 	double *__restrict__ moWavefuntionDX, *__restrict__ moWavefuntionDy, *__restrict__ moWavefuntionDZ, *__restrict__ distanceFromCenter, *__restrict__ dx, *__restrict__ dy, *__restrict__ dz;
 	double *__restrict__ moWavefuntionDXX, *__restrict__ moWavefuntionDYY, *__restrict__ moWavefuntionDZZ, *__restrict__ moWavefuntionVaule, *__restrict__ moWavefuntionHessian, *__restrict__ elecHess;
-
+	//values for basis functions
+	double *__restrict__ basisX,*__restrict__ basisY,*__restrict__ basisZ;
 
 
 	double *__restrict__ molecularOcupancyNumber, *__restrict__ *__restrict__ moleculerOrbatalCoefecents, *__restrict__ centerXvaule, *__restrict__ centerYvaule, *__restrict__ centerZvaule, *__restrict__ primitiveExponantationVaule;

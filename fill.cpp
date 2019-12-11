@@ -53,6 +53,7 @@ grid fill(int x, int y, int z, void * other, int Xsize, int Ysize, double cutOff
 
 	if ((*batch).vauleAtPoint(currentPoint, other) >= cutOff)
 	{
+		printf("nope\n");
 		*sucsess = false;
 		return data;
 	}
