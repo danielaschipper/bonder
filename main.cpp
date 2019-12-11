@@ -21,12 +21,12 @@ struct arguments
 	char* type;
 	char *inputFile="input.wfn";
 	double res=0.02;     
-	double cuttoff=0.3;
+	double cutoff=0.3;
 	char *output="output"; 
 	int cubesize=1;
 	double x1=0,x2=1,y1=0,y2=1,z1=0,z2=1;
 	int atom1=0,atom2=1,atom3=2,atom4=3;
-	char* dir='.';
+	char* dir=".";
 	char* configFile="config";
 };
 
@@ -49,66 +49,66 @@ static struct argp_option options[] =
 	{"atom3",'3',"ATOMNUMBER",0,"The first atom for use in  trinagle or quad mode"},
 	{"atom4",'4',"ATOMNUMBER",0,"The first atom for use in quad mode"},
 	{"directory",'d',"FOLDER",0,"The folder to put output files in"},
-	{"config",'c',"CONFIGFILE",0,"A file containing all of the options to run bonder, only in input mode"}
+	{"config",'f',"CONFIGFILE",0,"A file containing all of the options to run bonder, only in input mode"},
 	{0}
-}
+};
 
 static error_t parse_opt (int key, char *arg, struct argp_state *state)
 {
-	struct arguments *arguments = state->input;
+	arguments *argument = (arguments*)(state->input);
 
 	switch (key)
 	{
 		case 'i':
-			arguments->inputFile = arg;
+			argument->inputFile = arg;
 			break;
 		case 'r':
-			arguments->res = std::stod(arg);
+			argument->res = std::stod(arg);
 			break;
 		case 'c':
-			arguments->cuttoff = std::stod(arg);
+			argument->cutoff = std::stod(arg);
 			break;
 		case 'o':
-			arguments->outfile = arg;
+			argument->output = arg;
 			break;
-		case 'q'"
-			arguments->cubesize = std::stoi(arg);
+		case 'q':
+			argument->cubesize = std::stoi(arg);
                         break;
 		case 1:
-			arguments->x1 = std::stod(arg);
+			argument->x1 = std::stod(arg);
                         break;
 		case 2:
-                        arguments->y1 = std::stod(arg);
+                        argument->y1 = std::stod(arg);
                         break;
 		case 3:
-                        arguments->z1 = std::stod(arg);
+                        argument->z1 = std::stod(arg);
                         break;
 		case 4:
-                        arguments->x2 = std::stod(arg);
+                        argument->x2 = std::stod(arg);
                         break;
 		case 5:
-                        arguments->y2 = std::stod(arg);
+                        argument->y2 = std::stod(arg);
                         break;
 		case 6:
-                        arguments->y1 = std::stod(arg);
+                        argument->y1 = std::stod(arg);
                         break;
 		case '1':
-                        arguments->atom1 = std::stoi(arg);
+                        argument->atom1 = std::stoi(arg);
                         break;
 		case '2':
-                        arguments->atom2 = std::stoi(arg);
+                        argument->atom2 = std::stoi(arg);
                         break;
 		case '3':
-                        arguments->atom3 = std::stoi(arg);
+                        argument->atom3 = std::stoi(arg);
                         break;
 		case '4':
-                        arguments->atom4 = std::stoi(arg);
+                        argument->atom4 = std::stoi(arg);
                         break;
 		case 'd':
-                        arguments->dir = arg;
+                        argument->dir = arg;
                         break;
-		case 'c';
-			arguments->configFile=arg;
+		case 'f':
+			argument->configFile=arg;
 		case ARGP_KEY_ARG:
 			if (state->arg_num >= 1)
 			{
@@ -116,7 +116,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
 			}
 			else
 			{
-				arguments->type = arg;
+				argument->type = arg;
 			}
 			break;
 		case ARGP_KEY_END:
@@ -568,7 +568,7 @@ int main(int argc, char *argv[])
 	//letter file 1 2 res cutoff
 	if (arguments.type[0] == 'l')
 	{
-		drawline(std::stoi(arguments.atom1, arguments.atom2, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cube);
+		drawline(arguments.atom1, arguments.atom2, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
 
 	}
@@ -576,14 +576,14 @@ int main(int argc, char *argv[])
 	//letter file 1 2 res cutoff
 	if (arguments.type[0] == 't')
 	{
-				drawtrig(arguments.atom1, arguments.atom2,arguments.atom3, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize));
+				drawtrig(arguments.atom1, arguments.atom2,arguments.atom3, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
 
 	}
 
 	if (argv[1][0] == 'q')
 	{
-		drawquad(std::stoi(arguments.atom1, arguments.atom2,arguments.atom3,arguments.atom4, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
+		drawquad(arguments.atom1, arguments.atom2,arguments.atom3,arguments.atom4, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
 	}
 
@@ -591,28 +591,16 @@ int main(int argc, char *argv[])
 	//letter file res cutoff output
 	if (argv[1][0] == 'a')
 	{
-		runAll(arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cube);
+		runAll(arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
 	}
 
 	//letter file minx miny minz maxx maxy maxz res outputFile
 	if (argv[1][0] == 'g')
 	{
-		if (argc != 11 )
-		{
-			printf("arguments are bonder g inputFile minx miny minz maxx maxy maxz res outputFile\n");
-			return 0;
-		}
 		analysisBatch* batch = new analysisBatch(*inputFile);
-		try
-		{
-			outputCube(arguments.x1, arguments.y1, arguments.z1, arguments.x2, arguments.y2, arguments.z2, arguments.res, arguments.output, *inputFile, 1.0, batch, arguments.cube);
-		}
-		catch(const std::invalid_argument& ia)
-		{
-			std::cout << "error in arguments" << std::endl;
-			return 1;
-		}
+		outputCube(arguments.x1, arguments.y1, arguments.z1, arguments.x2, arguments.y2, arguments.z2, arguments.res, arguments.output, *inputFile, 1.0, batch, arguments.cubesize);
+		std::cout << "error in arguments" << std::endl;
 		printf("done");
 		return 0;
 	}
