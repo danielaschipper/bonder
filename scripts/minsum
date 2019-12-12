@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+files=$(ls -1d *.csv 2> /dev/null)
+
+for a in "${files[@]}"; do
+	data=$(cat $a)
+	data=($data)
+	echo $a ${data[$((${#ArrayName[@]} - 5))]} ${data[$((${#ArrayName[@]} -4))]} ${data[$((${#ArrayName[@]} -3))]} ${data[$((${#ArrayName[@]} -2))]} ${data[$((${#ArrayName[@]} -1))]} >> ${PWD##*/}".sum"
+	echo $a
+done
+
+
+#sed -i ':a;N;$!ba;s/\n//g' *.sum

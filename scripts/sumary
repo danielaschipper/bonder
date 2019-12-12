@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "" > ${PWD##*/}".sum"
+
+echo ${PWD##*/} ",">> ${PWD##*/}".sum"
+echo ${PWD##*/} "," | sed 's/-/,/' >> ${PWD##*/}".sum"
+cat *.log 2> /dev/null | sed 's/ //' |  sed ':a;N;$!ba;s/\n//g' | grep "HF=\\-*[0-9]*\\.[0-9]*" -o | tail -n 1   >> ${PWD##*/}".sum"
+
+files=$(ls -1d *.csv 2> /dev/null)
+
+for a in "${files[@]}"; do
+	data=$(cat $a)
+	data=($data)
+	echo $a, ${data[50]} ${data[51]} ${data[52]} ${data[53]} ${data[54]} ${data[55]} >> ${PWD##*/}".sum"
+	echo $a
+done
+
+
+#sed -i ':a;N;$!ba;s/\n//g' *.sum

@@ -1,0 +1,33 @@
+set terminal postscript landscape enhanced color 'Helvetica'  
+set encoding iso_8859_1
+set key 
+#defalt $X 0.06 $Y 0.6
+# LABEL examples
+#set label 1 '{/Symbol l}_2 < 0' at -0.15,1.5 font "Helvetica, 30"
+#set label 2 '{/Symbol l}_2 \176 0' at -0.02,1.5 font"Helvetica, 30" front
+#set label 3 '{/Symbol l}_2 > 0' at  0.1,1.5 font "Helvetica, 30"
+# Greek letters example
+set ylabel 's (a.u.)' offset -2,0 font "Helvetica, 24" 
+set xlabel 'sign({/Symbol l}_2){/Symbol r} (a.u.)' offset 0,-2 font "Helvetica, 24"
+# In the iso_8859_1 encoding "\" means octal code. 
+# \305 is the Angstroms symbol 
+set pm3d map
+set palette color
+set palette defined (-$X "blue",0.00 "green", $X "red")
+set format y "%.1f"
+set format x "%.2f"
+set format cb "%.2f"
+set border lw 2
+set xtic  -$X,0.02,$X nomirror out font "Helvetica,20"
+set ytic   0.0,0.2,$Y nomirror out font "Helvetica,20"
+unset colorbox
+set cbtic  -$X,0.02,$X nomirror font "Helvetica,20"
+set cbrange [-$X:$X]
+set xrange [-$X:$X]  
+set yrange [0.0:$Y] 
+set offsets 0.001, 0.001, 0.02, 0.00
+set output 'output.ps'
+plot 'output.dat' u 1:2:1 w p pt 63 ps 1 palette t ''
+# , 'wb97xd-cf3-min.dat' u 1:2:1 w p pt 63 ps 1 palette t ''  
+
+

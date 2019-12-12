@@ -1,0 +1,45 @@
+#!/bin/bash
+files=$(ls -1 | grep \.cuberdg)
+files=($files)
+#echo $files
+#files=($files)
+#echo $files
+echo > all.vmd
+for a in "${files[@]}"; do
+	echo $a
+	#echo $i
+	name="${a%.*}"
+	echo $name
+	printf  "set next [mol new \"" > $name".vmd"
+	printf  "%s" $a  >> $name".vmd"
+	echo "\" type cube first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all ]"  >> $name".vmd"
+	echo "mol addfile "$name".cuberhosign type cube first 0 last -1 step 1 filebonds 1 autobonds 1 waitfor all" >>$name".vmd"
+	echo "mol delrep 0 top" >> $name".vmd"
+	echo "if {[molinfo num] == 1} {" >> $name".vmd"
+	echo "mol representation CPK 1.000000 0.500000 250.000000 250.000000" >> $name".vmd"
+	echo "mol color Name" >> $name".vmd"
+	echo "mol selection {all}" >> $name".vmd"
+	echo "mol material Opaque" >> $name".vmd"
+	echo "mol addrep top}" >> $name".vmd"
+
+
+	echo "mol representation Isosurface "$1" 0 0 0 1 1" >> $name".vmd"
+	echo "mol color Volume 1" >> $name".vmd"
+	echo "mol selection {all}" >> $name".vmd"
+	echo "mol material Opaque" >> $name".vmd"
+	echo "mol addrep top" >> $name".vmd"
+	echo >> $name".vmd"
+	echo "mol selupdate 0 top 0" >> $name".vmd"
+	echo "mol colupdate 0 top 0" >> $name".vmd"
+	echo "mol scaleminmax top 0 -0.02 0.02" >> $name".vmd"
+	echo "mol smoothrep top 0 0" >> $name".vmd"
+	echo "mol drawframes top 0 {now}" >> $name".vmd"
+	
+	echo "source" $name".vmd" >> all.vmd
+	echo >> all.vmd
+done
+
+echo "color scale method BGR" >> all.vmd
+
+#echo render Tachyon scene.ty >> all.vmd
+#echo quit >> all.vmd

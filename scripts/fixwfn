@@ -1,0 +1,8 @@
+#!/bin/bash
+#echo $#
+sed -i 's/-/ -/g' $1
+sed -i 's/D -/D-/g' $1
+sed -i 's/CENTRE/CENTRE /' $1
+sed -i 's/  / /g' $1
+
+

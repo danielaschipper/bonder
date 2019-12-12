@@ -1,0 +1,30 @@
+#!/bin/bash
+echo $1".cuberhosign"
+count=$(cat $1".cuberhosign")
+count=($count)
+count=$(($count+6))
+
+sed "-e 1,"$count"d" $1".cuberhosign"  | tr " " "\n" | sed '/^$/d'  > a.cube
+sed "-e 1,"$count"d" $1".cuberdg" | tr " " "\n" | sed '/^$/d' > b.cube
+
+
+touch output.dat
+
+paste a.cube b.cube > output.dat
+if [ $# == 3 ]
+then
+	x=$2
+	y=$3
+else
+	x=0.06
+	y=0.6
+fi
+echo $x $y
+cat $(dirname "$0")"/gnuplotscript" | sed 's/$X/'$x'/'| sed 's/$X/'$x'/' | sed 's/$Y/'$y'/' > gnuplotscript
+gnuplot gnuplotscript
+convert output.ps ${PWD##*/}"-"$1".png"
+rm output.ps
+rm gnuplotscript
+rm a.cube
+rm b.cube
+mv output.dat $1".dat"
