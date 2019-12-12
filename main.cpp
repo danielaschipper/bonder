@@ -581,7 +581,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	if (argv[1][0] == 'q')
+	if (arguments.type[0] == 'q')
 	{
 		drawquad(arguments.atom1, arguments.atom2,arguments.atom3,arguments.atom4, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
@@ -589,18 +589,17 @@ int main(int argc, char *argv[])
 
 
 	//letter file res cutoff output
-	if (argv[1][0] == 'a')
+	if (arguments.type[0] == 'a')
 	{
 		runAll(arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
 		return 0;
 	}
 
 	//letter file minx miny minz maxx maxy maxz res outputFile
-	if (argv[1][0] == 'g')
+	if (arguments.type[0] == 'g')
 	{
 		analysisBatch* batch = new analysisBatch(*inputFile);
 		outputCube(arguments.x1, arguments.y1, arguments.z1, arguments.x2, arguments.y2, arguments.z2, arguments.res, arguments.output, *inputFile, 1.0, batch, arguments.cubesize);
-		std::cout << "error in arguments" << std::endl;
 		printf("done");
 		return 0;
 	}
@@ -608,7 +607,6 @@ int main(int argc, char *argv[])
 	//bool sucsess;
 	//anilizePoint(0, 0, 0, 0, 2000, 2000, 2501, &sucsess);
 	//printf("%d", sucsess);
-	printf("bonder h for help\n");
 	return 0;
 }
 
