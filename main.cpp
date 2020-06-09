@@ -26,7 +26,7 @@ struct arguments
 	int cubesize=1;
 	double x1=0,x2=1,y1=0,y2=1,z1=0,z2=1;
 	int atom1=0,atom2=1,atom3=2,atom4=3;
-	char* dir=".";
+	//char* dir=".";
 	char* configFile="config";
 };
 
@@ -48,7 +48,7 @@ static struct argp_option options[] =
 	{"atom2",'2',"ATOMNUMBER",0,"The first atom for use in line, trinagle or quad mode"},
 	{"atom3",'3',"ATOMNUMBER",0,"The first atom for use in  trinagle or quad mode"},
 	{"atom4",'4',"ATOMNUMBER",0,"The first atom for use in quad mode"},
-	{"directory",'d',"FOLDER",0,"The folder to put output files in"},
+	//{"directory",'d',"FOLDER",0,"The folder to put output files in"},
 	{"config",'f',"CONFIGFILE",0,"A file containing all of the options to run bonder, only in input mode"},
 	{0}
 };
@@ -104,9 +104,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
 		case '4':
                         argument->atom4 = std::stoi(arg);
                         break;
-		case 'd':
-                        argument->dir = arg;
-                        break;
+		//case 'd':
+                //        argument->dir = arg;
+                //        break;
 		case 'f':
 			argument->configFile=arg;
 		case ARGP_KEY_ARG:
