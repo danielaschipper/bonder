@@ -177,12 +177,16 @@ void analysisBatch::wavefunctionSecondDerivitive()
 	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
+		double dxxTemp=0, dyyTemp = 0, dzzTemp =0;
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionDXX[j] += moleculerOrbatalCoefecents[j][i] * basisX[i];
-			moWavefuntionDYY[j] += moleculerOrbatalCoefecents[j][i] * basisY[i];
-			moWavefuntionDZZ[j] += moleculerOrbatalCoefecents[j][i] * basisZ[i];
+			dxxTemp += moleculerOrbatalCoefecents[j][i] * basisX[i];
+			dyyTemp += moleculerOrbatalCoefecents[j][i] * basisY[i];
+			dzzTemp += moleculerOrbatalCoefecents[j][i] * basisZ[i];
 		}
+		moWavefuntionDXX[j] = dxxTemp;
+		moWavefuntionDYY[j] = dyyTemp;
+		moWavefuntionDZZ[j] = dzzTemp;
 	}
 
 
@@ -304,12 +308,18 @@ void analysisBatch::wavefuntionDerivitive()
 	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
+		double dxTemp = 0;
+		double dyTemp = 0;
+		double dzTemp = 0;
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionDX[j] += moleculerOrbatalCoefecents[j][i] * basisX[i];
-			moWavefuntionDy[j] += moleculerOrbatalCoefecents[j][i] * basisY[i];
-			moWavefuntionDZ[j] += moleculerOrbatalCoefecents[j][i] * basisZ[i];
+			dxTemp += moleculerOrbatalCoefecents[j][i] * basisX[i];
+			dyTemp += moleculerOrbatalCoefecents[j][i] * basisY[i];
+			dzTemp += moleculerOrbatalCoefecents[j][i] * basisZ[i];
 		}
+		moWavefuntionDZ[j] = dzTemp;
+		moWavefuntionDy[j] = dyTemp;
+		moWavefuntionDX[j] = dxTemp;
 	}
 }
 
@@ -348,10 +358,12 @@ void analysisBatch::wavefuntionVaule()
 	#pragma omp parallel for
 	for (int j = 0; j < nmo; ++j)
 	{
+		double valtemp = 0;
 		for (int i = 0; i < prims; ++i)
 		{
-			moWavefuntionVaule[j] += moleculerOrbatalCoefecents[j][i] * basisY[i];
+			valtemp += moleculerOrbatalCoefecents[j][i] * basisY[i];
 		}
+		moWavefuntionVaule[j] = valtemp;
 	}
 
 }
