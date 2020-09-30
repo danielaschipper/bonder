@@ -1,9 +1,8 @@
-﻿Making bonder
-Step one: install boost 
-sudo apt-get install libboost-all-dev
-If you do not have administrative access, install boost locally and edit the makefile 
-Step two: run make
-step 3 copy the bond excitable to where you want to install it
+﻿Building bonder
+git clone https://github.com/danielaschipper/bonder.git
+cd bonder
+make
+cp bonder ~/bin
 
 Usage
 bond h will give the various modes the program has
