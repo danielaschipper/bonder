@@ -85,7 +85,7 @@ void AtomXYZ(wfnData* output,ifstream* inputFile)
 		output->y[i] = data[3*i+1];
 		output->z[i] = data[3*i+2];
 	}
-	delete data;
+	delete[] data;
 
 }
 
@@ -177,7 +177,7 @@ void mos(wfnData* output,ifstream* inputFile)
 {
 	string line;
 	(*output).molecularOrbatalCoeficents = new double*[(*output).MO];
-	for (int i = 0; i < (*output).prim; i++)
+	for (int i = 0; i < (*output).MO; i++)
         {
                 (*output).molecularOrbatalCoeficents[i] = new double[(*output).prim];
         }
