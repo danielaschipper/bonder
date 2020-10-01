@@ -86,19 +86,19 @@ analysisBatch::analysisBatch(wfnData input)
 //cleanup
 analysisBatch::~analysisBatch()
 {
-	delete moWavefuntionDX;
-	delete moWavefuntionDy;
-	delete moWavefuntionDZ;
-	delete moWavefuntionDXX;
-	delete moWavefuntionDYY;
-	delete moWavefuntionDZZ;
-	delete moWavefuntionVaule;
-	delete moWavefuntionHessian;
-	delete elecHess;
-	delete distanceFromCenter;
-	delete dx;
-	delete dy;
-	delete dz;
+	delete[] moWavefuntionDX;
+	delete[] moWavefuntionDy;
+	delete[] moWavefuntionDZ;
+	delete[] moWavefuntionDXX;
+	delete[] moWavefuntionDYY;
+	delete[] moWavefuntionDZZ;
+	delete[] moWavefuntionVaule;
+	delete[] moWavefuntionHessian;
+	delete[] elecHess;
+	delete[] distanceFromCenter;
+	delete[] dx;
+	delete[] dy;
+	delete[] dz;
 }
 
 

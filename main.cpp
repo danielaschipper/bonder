@@ -150,14 +150,14 @@ wfnData* init(std::string file)
 
 void drawline(int a, int b, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
-	analysisBatch* batch = new analysisBatch(*inputFile);
-	double lowX = (*batch).atomx(a);
-	double lowY = (*batch).atomy(a);
-	double lowZ = (*batch).atomz(a);
+	analysisBatch batch = analysisBatch(*inputFile);
+	double lowX = (batch).atomx(a);
+	double lowY = (batch).atomy(a);
+	double lowZ = (batch).atomz(a);
 
-	double highX = (*batch).atomx(b);
-	double highY = (*batch).atomy(b);
-	double highZ = (*batch).atomz(b);
+	double highX = (batch).atomx(b);
+	double highY = (batch).atomy(b);
+	double highZ = (batch).atomz(b);
 
 	printf("testing line between %d and %d\n",a,b);
 	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
@@ -177,7 +177,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	int maxi = 0;
 	for (int i = 0; i < reps; i++)
 	{
-		double mesured = (*batch).RDG(lowX + i*dx, lowY + i*dy, lowZ + i*dz);
+		double mesured = (batch).RDG(lowX + i*dx, lowY + i*dy, lowZ + i*dz);
 		if (mesured < cutoff)
 		{
 			maxi = i;
@@ -188,23 +188,22 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 	if (maxi)
 	{
 		analysis analize = analysis();
-		analize.setUpAnalysisBatch(lowX + maxi*dx, lowY + maxi*dy, lowZ + maxi*dz, res,batch);
-		analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, batch,makeCube);
+		analize.setUpAnalysisBatch(lowX + maxi*dx, lowY + maxi*dy, lowZ + maxi*dz, res,&batch);
+		analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, &batch,makeCube);
 	}
-	delete batch;
 }
 
 void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 
-	analysisBatch* batch = new analysisBatch(*inputFile);
-	double highX = ((*batch).atomx(a) + (*batch).atomx(b))/2;
-	double highY = ((*batch).atomy(a) + (*batch).atomy(b))/2;
-	double highZ = ((*batch).atomz(a) + (*batch).atomz(b))/2;
+	analysisBatch batch = analysisBatch(*inputFile);
+	double highX = ((batch).atomx(a) + (batch).atomx(b))/2;
+	double highY = ((batch).atomy(a) + (batch).atomy(b))/2;
+	double highZ = ((batch).atomz(a) + (batch).atomz(b))/2;
 
-	double lowX = (*batch).atomx(c);
-	double lowY = (*batch).atomy(c);
-	double lowZ = (*batch).atomz(c);
+	double lowX = (batch).atomx(c);
+	double lowY = (batch).atomy(c);
+	double lowZ = (batch).atomz(c);
 
 	printf("testing line between centre of %d and %d and %d\n",a,b,c);
 	if (((highX - lowX)*(highX - lowX) + (highY - lowY)*(highY - lowY) + (highZ - lowZ)*(highZ - lowZ)) > 100)
@@ -225,20 +224,19 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 	for (int i = 0; i < reps; i++)
 	{
 		int k = i;
-		double mesured = (*batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
+		double mesured = (batch).RDG(lowX + k*dx, lowY + k*dy, lowZ + k*dz);
 		if (mesured <= cutoff)
 		{
 
 			analysis analize = analysis();
-			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,batch);
+			analize.setUpAnalysisBatch(lowX + k*dx, lowY + k*dy, lowZ + k*dz, res,&batch);
 
-			analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, batch,makeCube);
+			analize.anilizePoint(0, 0, 0, 0, size, size, cutoff, &sucsess, inputFile, outputfile, &batch,makeCube);
 			break;
 		}
 	}
 
 
-	delete batch;
 }
 
 void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
