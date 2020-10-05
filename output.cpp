@@ -197,7 +197,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 
 						}
 					}
-					delete energy;
+					delete[] energy;
 				}
 
 			}
@@ -276,17 +276,17 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 		outputFile.close();
 	}
 
-	delete kinEngplus;
-	delete potEngplus;
-	delete totEngplus;
-	delete pointsplus;
-	delete rhoplus;
-	delete elfplus;
+	delete[] kinEngplus;
+	delete[] potEngplus;
+	delete[] totEngplus;
+	delete[] pointsplus;
+	delete[] rhoplus;
+	delete[] elfplus;
 
-	delete kinEngminus;
-	delete potEngminus;
-	delete totEngminus;
-	delete pointsminus;
-	delete elfminus;
-	delete rhominus;
+	delete[] kinEngminus;
+	delete[] potEngminus;
+	delete[] totEngminus;
+	delete[] pointsminus;
+	delete[] elfminus;
+	delete[] rhominus;
 }

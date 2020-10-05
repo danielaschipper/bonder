@@ -134,7 +134,7 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 						lastZ = INT32_MAX;
 				}
 			}
-			delete edges;
+			delete[] edges;
 
 		}
 	}
