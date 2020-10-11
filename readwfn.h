@@ -28,6 +28,16 @@ struct wfnData
 		}
 
 	}
+
+	~wfnData()
+	{
+		delete[] x,y,z,name,charge,primitiveCenters,primitiveOrbatalTypes,primitiveExponents,MOType,molecularOrbitalOcupancyNumber,MOeng;
+		for (int i =0; i < MO; i++)
+		{
+			delete[] molecularOrbatalCoeficents[i];
+		}
+		
+	}
 };
 
 wfnData* readFile(std::string file);

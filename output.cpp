@@ -8,12 +8,12 @@
 
 using namespace std;
 
-void outputCube(double minx, double miny, double minz, double maxx, double maxy, double maxz, double res, string file, wfnData inputData,double cutoff,analysisBatch* batch,int makeCube)
+void outputCube(double minx, double miny, double minz, double maxx, double maxy, double maxz, double res, string file, wfnData* inputData,double cutoff,analysisBatch* batch,int makeCube)
 {
 	int maxL = 90;
 	int a = 0,b = 0;
 	//find which atoms the interaction is between
-	for (int i = 0; i < inputData.nuc; i++)
+	for (int i = 0; i < inputData->nuc; i++)
 	{
 		for (int j = 0; j < i; j++)
 		{
@@ -55,7 +55,7 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	
 	
 	
-	file += "-" + std::to_string(a) + inputData.name[a] + "-" + std::to_string(b) + inputData.name[b];
+	file += "-" + std::to_string(a) + inputData->name[a] + "-" + std::to_string(b) + inputData->name[b];
 
 	int dx = (maxx - minx) / res;
 	int dy = (maxy - miny) / res;
@@ -104,21 +104,21 @@ void outputCube(double minx, double miny, double minz, double maxx, double maxy,
 	if (makeCube)
 	{
 		outputFile << endl << endl;
-		outputFile << "  " << inputData.nuc << "  " << minx << "  " << miny << "  " << minz << endl;
+		outputFile << "  " << inputData->nuc << "  " << minx << "  " << miny << "  " << minz << endl;
 		outputFile << "  " << (dx-1) / makeCube + 1 << "  " << res * makeCube << "  0  0" << endl;
 		outputFile << "  " << (dy-1) / makeCube + 1 << "  0  " << res * makeCube << "  0" << endl;
 		outputFile << "  " << (dz-1) / makeCube + 1<< "  0  0  " << res * makeCube << endl;
 
 		outputFilerho << endl << endl;
-		outputFilerho << "  " << inputData.nuc << "  " << minx << "  " << miny << "  " << minz << endl;
+		outputFilerho << "  " << inputData->nuc << "  " << minx << "  " << miny << "  " << minz << endl;
 		outputFilerho << "  " << (dx-1) / makeCube + 1 << "  " << res * makeCube << "  0  0" << endl;
 		outputFilerho << "  " << (dy-1) / makeCube + 1 << "  0  " << res * makeCube << "  0" << endl;
 		outputFilerho << "  " << (dz-1) / makeCube + 1 << "  0  0  " << res * makeCube << endl;
 
-		for (int i = 0; i < inputData.nuc; i++)
+		for (int i = 0; i < inputData->nuc; i++)
 		{
-			outputFile << "  " << inputData.charge[i] << "  " << inputData.charge[i] << "  " << inputData.x[i] << "  " << inputData.y[i] << "  " << inputData.z[i] << endl;
-			outputFilerho << "  " << inputData.charge[i] << "  " << inputData.charge[i] << "  " << inputData.x[i] << "  " << inputData.y[i] << "  " << inputData.z[i] << endl;
+			outputFile << "  " << inputData->charge[i] << "  " << inputData->charge[i] << "  " << inputData->x[i] << "  " << inputData->y[i] << "  " << inputData->z[i] << endl;
+			outputFilerho << "  " << inputData->charge[i] << "  " << inputData->charge[i] << "  " << inputData->x[i] << "  " << inputData->y[i] << "  " << inputData->z[i] << endl;
 		}
 	}
 

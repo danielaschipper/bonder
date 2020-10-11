@@ -150,7 +150,7 @@ wfnData* init(std::string file)
 
 void drawline(int a, int b, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
-	analysisBatch batch = analysisBatch(*inputFile);
+	analysisBatch batch = analysisBatch(inputFile);
 	double lowX = (batch).atomx(a);
 	double lowY = (batch).atomy(a);
 	double lowZ = (batch).atomz(a);
@@ -196,7 +196,7 @@ void drawline(int a, int b, double res, double cutoff,std::string outputfile,int
 void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 
-	analysisBatch batch = analysisBatch(*inputFile);
+	analysisBatch batch = analysisBatch(inputFile);
 	double highX = ((batch).atomx(a) + (batch).atomx(b))/2;
 	double highY = ((batch).atomy(a) + (batch).atomy(b))/2;
 	double highZ = ((batch).atomz(a) + (batch).atomz(b))/2;
@@ -242,7 +242,7 @@ void drawtrig(int a, int b,int c, double res, double cutoff,std::string outputfi
 void drawquad(int a, int b,int c,int d, double res, double cutoff,std::string outputfile,int size, wfnData* inputFile,int makeCube)
 {
 
-	analysisBatch* batch = new analysisBatch(*inputFile);
+	analysisBatch* batch = new analysisBatch(inputFile);
 	double highX = ((*batch).atomx(a) + (*batch).atomx(b))/2;
 	double highY = ((*batch).atomy(a) + (*batch).atomy(b))/2;
 	double highZ = ((*batch).atomz(a) + (*batch).atomz(b))/2;
@@ -317,10 +317,7 @@ void runAll(double res, double cutoff,std::string outputfile,int size, wfnData* 
 	{
 		for (int j = 0; j < i; j++)
 		{
-			pdrawArgs *lineData;
-			lineData = new pdrawArgs(i, j, res, cutoff, outputfile, size, inputFile, makeCube);
-			pDrawline((void *)lineData);
-
+			drawline(i,j,res,cutoff,outputfile,size,inputFile,makeCube);
 		}
 	}
 
@@ -382,7 +379,7 @@ void useInputFile(char* filename)
 			return;
 		}
 		bool sucsess;
-		analysisBatch* batch = new analysisBatch(*inputFile);
+		analysisBatch* batch = new analysisBatch(inputFile);
 		analysis analize = analysis();
 		try
 		{
@@ -500,11 +497,11 @@ void useInputFile(char* filename)
 			return;
 		}
 
-		analysisBatch* batch = new analysisBatch(*inputFile);
+		analysisBatch* batch = new analysisBatch(inputFile);
 		try
 		{
 
-			outputCube(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]), std::stod(lines[6]), std::stod(lines[7]), std::stod(lines[8]), lines[9], *inputFile, 1.0, batch, 1);
+			outputCube(std::stod(lines[2]), std::stod(lines[3]), std::stod(lines[4]), std::stod(lines[5]), std::stod(lines[6]), std::stod(lines[7]), std::stod(lines[8]), lines[9], inputFile, 1.0, batch, 1);
 		}
 		catch(const std::invalid_argument& ia)
 		{
@@ -531,23 +528,23 @@ int main(int argc, char *argv[])
 	}
 
 	wfnData *inputFile = 0;
-		try
-		{
-			inputFile = init(arguments.inputFile);
+	try
+	{
+		inputFile = init(arguments.inputFile);
 
-		}
-		catch (const std::invalid_argument& ia) 
-		{
-			std::cout << "error in parssing wavefunction data, if you have more than 100 atoms 'bonder fixwfn' must be run" << std::endl;
-			return 1;
-		}
+	}
+	catch (const std::invalid_argument& ia) 
+	{
+		std::cout << "error in parssing wavefunction data, if you have more than 100 atoms 'bonder fixwfn' must be run" << std::endl;
+		return 1;
+	}
 
 	std::cout << "data read" << std::endl;
 	//letter file x y z res cutoff
 	if (arguments.type[0] == 'p')
 	{
 		bool sucsess;
-		analysisBatch* batch = new analysisBatch(*inputFile);
+		analysisBatch* batch = new analysisBatch(inputFile);
 		analysis analize = analysis();
 		analize.setUpAnalysisBatch( arguments.x1 , arguments.y1, arguments.z1, arguments.res,batch);
 		analize.anilizePoint(0, 0, 0, 0, SIZE, SIZE, arguments.cutoff, &sucsess, inputFile, arguments.output, batch, arguments.cubesize);
@@ -560,6 +557,7 @@ int main(int argc, char *argv[])
 		{
 			printf("point given is not in region\n");
 		}
+		delete inputFile;
 		return 0;
 	}
 
@@ -567,6 +565,7 @@ int main(int argc, char *argv[])
 	if (arguments.type[0] == 'l')
 	{
 		drawline(arguments.atom1, arguments.atom2, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
+		delete inputFile;
 		return 0;
 
 	}
@@ -574,7 +573,8 @@ int main(int argc, char *argv[])
 	//letter file 1 2 res cutoff
 	if (arguments.type[0] == 't')
 	{
-				drawtrig(arguments.atom1, arguments.atom2,arguments.atom3, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
+		drawtrig(arguments.atom1, arguments.atom2,arguments.atom3, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
+		delete inputFile;
 		return 0;
 
 	}
@@ -582,6 +582,7 @@ int main(int argc, char *argv[])
 	if (arguments.type[0] == 'q')
 	{
 		drawquad(arguments.atom1, arguments.atom2,arguments.atom3,arguments.atom4, arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
+		delete inputFile;
 		return 0;
 	}
 
@@ -590,15 +591,17 @@ int main(int argc, char *argv[])
 	if (arguments.type[0] == 'a')
 	{
 		runAll(arguments.res, arguments.cutoff, arguments.output, SIZE, inputFile, arguments.cubesize);
+		delete inputFile;
 		return 0;
 	}
 
 	//letter file minx miny minz maxx maxy maxz res outputFile
 	if (arguments.type[0] == 'g')
 	{
-		analysisBatch* batch = new analysisBatch(*inputFile);
-		outputCube(arguments.x1, arguments.y1, arguments.z1, arguments.x2, arguments.y2, arguments.z2, arguments.res, arguments.output, *inputFile, 1.0, batch, arguments.cubesize);
+		analysisBatch* batch = new analysisBatch(inputFile);
+		outputCube(arguments.x1, arguments.y1, arguments.z1, arguments.x2, arguments.y2, arguments.z2, arguments.res, arguments.output, inputFile, 1.0, batch, arguments.cubesize);
 		printf("done");
+		delete inputFile;
 		return 0;
 	}
 

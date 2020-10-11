@@ -80,7 +80,7 @@ wfnData* readFile(string file)
 	(*output).MOType = new double[(*output).MO];
 	(*output).MOeng = new double[(*output).MO];
 	(*output).molecularOrbatalCoeficents = new double*[(*output).MO];
-	for (int i = 0; i < (*output).prim; i++)
+	for (int i = 0; i < (*output).MO; i++)
 	{
 		(*output).molecularOrbatalCoeficents[i] = new double[(*output).prim];
 	}

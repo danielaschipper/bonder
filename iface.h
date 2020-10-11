@@ -10,7 +10,7 @@
 class analysisBatch
 {
 public:
-	analysisBatch(wfnData input);
+	analysisBatch(wfnData* input);
 	~analysisBatch();
 	//called by the flood fill ajusted from the grid to floating space
 	double vauleAtPoint(point Point, void *other);

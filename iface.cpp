@@ -38,9 +38,9 @@ void analysisBatch::setUpBatch(double x, double y, double z, double resalution)
 }
 
 //more setup
-analysisBatch::analysisBatch(wfnData input)
+analysisBatch::analysisBatch(wfnData* input)
 {
-	nmo = input.MO;
+	nmo = input->MO;
 	moWavefuntionDX = new double[nmo];
 	moWavefuntionDy = new double[nmo];
 	moWavefuntionDZ = new double[nmo];
@@ -52,9 +52,9 @@ analysisBatch::analysisBatch(wfnData input)
 	
 	elecHess = new double[9];
 
-	centers = input.nuc;
+	centers = input->nuc;
 	
-	prims = input.prim;
+	prims = input->prim;
 	basisX = new double[prims];
 	basisY = new double[prims];
 	basisZ = new double[prims];
@@ -65,18 +65,18 @@ analysisBatch::analysisBatch(wfnData input)
 	dz = new double[centers];
 
 
-	molecularOcupancyNumber = input.molecularOrbitalOcupancyNumber;
-	moleculerOrbatalCoefecents = input.molecularOrbatalCoeficents;
+	molecularOcupancyNumber = input->molecularOrbitalOcupancyNumber;
+	moleculerOrbatalCoefecents = input->molecularOrbatalCoeficents;
 	
 
-	primitiveCenter = input.primitiveCenters;
-	primitiveType = input.primitiveOrbatalTypes;
+	primitiveCenter = input->primitiveCenters;
+	primitiveType = input->primitiveOrbatalTypes;
 
-	primitiveExponantationVaule = input.primitiveExponents;
+	primitiveExponantationVaule = input->primitiveExponents;
 
-	centerXvaule = input.x;
-	centerYvaule = input.y;
-	centerZvaule = input.z;
+	centerXvaule = input->x;
+	centerYvaule = input->y;
+	centerZvaule = input->z;
 
 
 
@@ -99,6 +99,9 @@ analysisBatch::~analysisBatch()
 	delete[] dx;
 	delete[] dy;
 	delete[] dz;
+	delete[] basisX;
+	delete[] basisY;
+	delete[] basisZ;
 }
 
 

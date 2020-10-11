@@ -155,17 +155,15 @@ point* getOrthoNeibors(point currentPoint,point *neibors)
 
 bool checkIfUsed(gridPoint* editingPoint, point Point)
 {
-	gridPoint EditingPoint = *editingPoint;
-		if ((*(EditingPoint.edges)).search(Point.z))
-		{
-			return true;
-		}
+	if ((*(editingPoint->edges)).search(Point.z))
+	{
+		return true;
+	}
 
-
-		if ((*(EditingPoint.internalPoints)).search(Point.z))
-		{
-			return true;
-		}
+	if ((*(editingPoint->internalPoints)).search(Point.z))
+	{
+		return true;
+	}
 
 	return false;
 }

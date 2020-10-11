@@ -90,15 +90,15 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 		return;
 	}
 	int maxX=x, maxY=y, maxZ=0, minX=x, minY=y, minZ=0;
-	int vol = 0;
-	gridPoint currentPoint;
+	long int vol = 0;
+	gridPoint* currentPoint;
 	for (int i = -Xsize/2; i < Xsize/2; i++)
 	{
 		for (int j = -Ysize/2; j < Ysize/2; j++)
 		{
-			currentPoint = *getPoint(&results, i, j);
+			currentPoint = getPoint(&results, i, j);
 			int size;
-			edgepoint* edges = (*(currentPoint.edges)).dump(&size);
+			edgepoint* edges = (*(currentPoint->edges)).dump(&size);
 			if (size == 0)
 				continue;
 			if (i > maxX)
@@ -169,7 +169,7 @@ void analysis::anilizePoint(int x, int y, int z, void * other, int Xsize, int Ys
 	printf("volume is  %f\n", vol*res*res*res);
 
 	if (!(outputFile.empty()))
-		outputCube(minX* res + offsetx, minY* res + offsety, minZ* res + offsetz, maxX* res + offsetx, maxY* res + offsety, maxZ* res + offsetz, res, outputFile, *data,cutOff,batch,makeCube);
+		outputCube(minX* res + offsetx, minY* res + offsety, minZ* res + offsetz, maxX* res + offsetx, maxY* res + offsety, maxZ* res + offsetz, res, outputFile, data,cutOff,batch,makeCube);
 	/*for (int i = 0; i < Xsize; i++)
 	  {
 	  for (int j = 0; j < Ysize; j++)

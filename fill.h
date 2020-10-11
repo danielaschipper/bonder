@@ -18,12 +18,22 @@ struct gridPoint
 		edges = new LLE;
 		internalPoints = new LLi;
 	}
+	~gridPoint()
+	{
+		delete edges;
+		delete internalPoints;
+	}
+
 };
 
 struct grid
 {
 	gridPoint *data;
 	int x, y;
+	~grid()
+	{
+		delete[] data;
+	}
 };
 
 //runs the flood fil algorytem
